@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
+  applyEventRollover,
   buildEventCard,
   buildPastHtml,
   buildUpcomingHtml,
@@ -15,6 +16,58 @@ describe('content/events.json', () => {
     expect(eventsData.past).toHaveLength(2);
     expect(eventsData.past[0].poster).toBe('images/events/path-of-raga.png');
     expect(eventsData.past[1].poster).toBe('images/events/joyful-summer-evening-of-raga.png');
+  });
+});
+
+describe('applyEventRollover', () => {
+  const sampleEvent = {
+    title: 'Summer Concert',
+    date: '2026-06-01',
+    dateDisplay: 'June 1, 2026',
+    venue: 'Main Hall',
+    detail: 'An evening of raga.',
+  };
+
+  it('moves upcoming events before today into past', () => {
+    const result = applyEventRollover(
+      { upcoming: [sampleEvent], past: [] },
+      new Date(2026, 5, 2)
+    );
+
+    expect(result.upcoming).toHaveLength(0);
+    expect(result.past).toHaveLength(1);
+    expect(result.past[0].title).toBe('Summer Concert');
+  });
+
+  it('keeps events on or after today in upcoming', () => {
+    const result = applyEventRollover(
+      { upcoming: [sampleEvent], past: [] },
+      new Date(2026, 5, 1)
+    );
+
+    expect(result.upcoming).toHaveLength(1);
+    expect(result.past).toHaveLength(0);
+  });
+
+  it('does not duplicate events already listed as past', () => {
+    const result = applyEventRollover(
+      { upcoming: [sampleEvent], past: [sampleEvent] },
+      new Date(2026, 5, 2)
+    );
+
+    expect(result.upcoming).toHaveLength(0);
+    expect(result.past).toHaveLength(1);
+  });
+
+  it('keeps events without a date in upcoming', () => {
+    const undated = { ...sampleEvent, date: '' };
+    const result = applyEventRollover(
+      { upcoming: [undated], past: [] },
+      new Date(2026, 5, 2)
+    );
+
+    expect(result.upcoming).toHaveLength(1);
+    expect(result.past).toHaveLength(0);
   });
 });
 

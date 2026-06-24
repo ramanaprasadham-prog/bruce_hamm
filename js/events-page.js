@@ -13,6 +13,50 @@ function buildTicketHtml(event) {
   return `${prefix}<a href="${escapeHtml(event.ticketUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(event.ticketLabel)}</a>.`;
 }
 
+export function todayIsoDate(referenceDate = new Date()) {
+  const year = referenceDate.getFullYear();
+  const month = String(referenceDate.getMonth() + 1).padStart(2, '0');
+  const day = String(referenceDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function eventKey(event) {
+  return `${event.date}|${event.title}`;
+}
+
+export function applyEventRollover(data, referenceDate = new Date()) {
+  const today = todayIsoDate(referenceDate);
+  const upcoming = data.upcoming ?? [];
+  const past = data.past ?? [];
+
+  const stillUpcoming = [];
+  const rolledPast = [];
+
+  for (const event of upcoming) {
+    if (event.date && event.date < today) {
+      rolledPast.push(event);
+    } else {
+      stillUpcoming.push(event);
+    }
+  }
+
+  const seen = new Set();
+  const mergedPast = [];
+
+  for (const event of [...rolledPast, ...past]) {
+    const key = eventKey(event);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    mergedPast.push(event);
+  }
+
+  return {
+    ...data,
+    upcoming: stillUpcoming,
+    past: mergedPast,
+  };
+}
+
 export function buildEventCard(event, { reveal = true } = {}) {
   const posterHtml = event.poster
     ? `<div class="event-poster">
@@ -80,8 +124,9 @@ export async function initEventsPage(options = {}) {
     if (!response.ok) throw new Error(`Failed to load events (${response.status})`);
 
     const data = await response.json();
-    upcomingRoot.innerHTML = buildUpcomingHtml(data);
-    pastRoot.innerHTML = buildPastHtml(data);
+    const displayData = applyEventRollover(data, options.referenceDate);
+    upcomingRoot.innerHTML = buildUpcomingHtml(displayData);
+    pastRoot.innerHTML = buildPastHtml(displayData);
 
     document.querySelectorAll('#events-upcoming .reveal, #events-past .reveal').forEach((el) => {
       el.classList.add('visible');
