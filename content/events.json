@@ -1,14 +1,6 @@
 {
   "emptyMessage": "Coming soon. New concert dates and appearances will be posted here.",
-  "upcoming": [
-    {
-      "title": "test title",
-      "dateDisplay": "Saturday, June 27, 2026 · 3:00–7:00 PM",
-      "venue": "test venue",
-      "detail": "test details",
-      "poster": "/images/events/screenshot-2026-02-08-194956.png"
-    }
-  ],
+  "upcoming": [],
   "past": [
     {
       "title": "Path of Raga",
