@@ -51,38 +51,12 @@
     <section class="page-content page-content-wide">
       <div class="events-section reveal">
         <h2 class="events-section-title">Upcoming Events</h2>
-        <div class="events-empty">
-          <p>Coming soon. New concert dates and appearances will be posted here.</p>
-          <p>For booking inquiries, please <a href="contact.html">get in touch</a>.</p>
-        </div>
+        <div id="events-upcoming" aria-live="polite"></div>
       </div>
 
       <div class="events-section reveal">
         <h2 class="events-section-title">Past Events</h2>
-        <ul class="event-list">
-          <li class="event-card reveal">
-            <div class="event-poster">
-              <img src="images/events/path-of-raga.png" alt="Path of Raga — student recital poster">
-            </div>
-            <time class="event-date" datetime="2026-06-13">Saturday, June 13, 2026 · 3:00–7:00 PM</time>
-            <h3 class="event-title">Path of Raga</h3>
-            <p class="event-venue">Sri Krishna Balaram Mandir · 680 E Calaveras Blvd, Milpitas, CA 95035</p>
-            <p class="event-detail">Student recital featuring students of Bruce Hamm and Joanna Mack. Free and open to all.</p>
-          </li>
-
-          <li class="event-card reveal">
-            <div class="event-poster">
-              <img src="images/events/joyful-summer-evening-of-raga.png" alt="Joyful summer evening of Raga — concert poster">
-            </div>
-            <time class="event-date" datetime="2026-05-16">Saturday, May 16, 2026 · 5:30 PM</time>
-            <h3 class="event-title">Joyful Summer Evening of Raga</h3>
-            <p class="event-venue">Blacow · Fremont, CA</p>
-            <p class="event-detail">
-              Sitar, Sarod and Tabla — Joanna Mack (sitar), Bruce Hamm (sarod), Amod Dandawate (tabla).
-              Tickets were available on <a href="https://www.groupmuse.com" target="_blank" rel="noopener noreferrer">Groupmuse.com</a>.
-            </p>
-          </li>
-        </ul>
+        <div id="events-past" aria-live="polite"></div>
       </div>
     </section>
   </main>
@@ -122,5 +96,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script type="module" src="js/events-page.js"></script>
 </body>
 </html>

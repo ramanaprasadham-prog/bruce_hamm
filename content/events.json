@@ -1,0 +1,27 @@
+{
+  "emptyMessage": "Coming soon. New concert dates and appearances will be posted here.",
+  "upcoming": [],
+  "past": [
+    {
+      "title": "Path of Raga",
+      "date": "2026-06-13",
+      "dateDisplay": "Saturday, June 13, 2026 · 3:00–7:00 PM",
+      "venue": "Sri Krishna Balaram Mandir · 680 E Calaveras Blvd, Milpitas, CA 95035",
+      "detail": "Student recital featuring students of Bruce Hamm and Joanna Mack. Free and open to all.",
+      "poster": "images/events/path-of-raga.png",
+      "posterAlt": "Path of Raga — student recital poster"
+    },
+    {
+      "title": "Joyful Summer Evening of Raga",
+      "date": "2026-05-16",
+      "dateDisplay": "Saturday, May 16, 2026 · 5:30 PM",
+      "venue": "Blacow · Fremont, CA",
+      "detail": "Sitar, Sarod and Tabla — Joanna Mack (sitar), Bruce Hamm (sarod), Amod Dandawate (tabla).",
+      "ticketUrl": "https://www.groupmuse.com",
+      "ticketLabel": "Groupmuse.com",
+      "ticketText": "Tickets were available on",
+      "poster": "images/events/joyful-summer-evening-of-raga.png",
+      "posterAlt": "Joyful summer evening of Raga — concert poster"
+    }
+  ]
+}

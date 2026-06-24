@@ -18,6 +18,8 @@ $items = @(
   'events.html',
   'lessons.html',
   'contact.html',
+  'admin',
+  'content',
   'css',
   'js',
   'images',

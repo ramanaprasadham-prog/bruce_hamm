@@ -27,7 +27,7 @@ jobs:
         run: |
           mkdir site
           cp *.html site/
-          cp -r css js images audio site/
+          cp -r admin content css js images audio site/
 
       - uses: actions/configure-pages@v5
 

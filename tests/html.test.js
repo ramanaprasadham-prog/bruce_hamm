@@ -228,15 +228,13 @@ describe('music.html', () => {
 describe('events.html', () => {
   const html = readPage('events.html');
 
-  it('includes upcoming and past event sections', () => {
+  it('loads events from CMS data via events-page.js', () => {
     expect(html).toContain('Upcoming Events');
     expect(html).toContain('Past Events');
     expect(html).toContain('events-section');
-    expect(html).toContain('event-list');
-    expect(html).toContain('Path of Raga');
-    expect(html).toContain('Joyful Summer Evening of Raga');
-    expect(html).toContain('images/events/path-of-raga.png');
-    expect(html).toContain('images/events/joyful-summer-evening-of-raga.png');
+    expect(html).toContain('id="events-upcoming"');
+    expect(html).toContain('id="events-past"');
+    expect(html).toContain('js/events-page.js');
   });
 });
 
@@ -294,6 +292,9 @@ describe('asset files', () => {
     'images/homepage-bg/sitar-closeup.png',
     'images/homepage-bg/outdoor-group.png',
     'images/homepage-bg/stage-group.png',
+    'content/events.json',
+    'admin/config.yml',
+    'admin/index.html',
     'images/events/path-of-raga.png',
     'images/events/joyful-summer-evening-of-raga.png',
     'images/morning-ragas-cover.png',

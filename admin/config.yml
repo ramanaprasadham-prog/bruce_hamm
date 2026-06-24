@@ -1,0 +1,73 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: images/events
+public_folder: /images/events
+
+collections:
+  - name: events
+    label: Events
+    files:
+      - name: schedule
+        label: Event Schedule
+        file: content/events.json
+        fields:
+          - label: Message when no upcoming events
+            name: emptyMessage
+            widget: text
+            default: Coming soon. New concert dates and appearances will be posted here.
+          - label: Upcoming Events
+            name: upcoming
+            label_singular: Upcoming Event
+            widget: list
+            summary: "{{fields.title}} — {{fields.dateDisplay}}"
+            fields: &event_fields
+              - label: Title
+                name: title
+                widget: string
+              - label: Date (for sorting)
+                name: date
+                widget: date
+                date_format: YYYY-MM-DD
+                picker_utc: false
+              - label: Date display
+                name: dateDisplay
+                widget: string
+                hint: "Example: Saturday, June 13, 2026 · 3:00–7:00 PM"
+              - label: Venue
+                name: venue
+                widget: string
+              - label: Details
+                name: detail
+                widget: text
+              - label: Poster image
+                name: poster
+                widget: image
+                required: false
+              - label: Poster alt text
+                name: posterAlt
+                widget: string
+                required: false
+              - label: Ticket URL
+                name: ticketUrl
+                widget: string
+                required: false
+              - label: Ticket link label
+                name: ticketLabel
+                widget: string
+                required: false
+                hint: "Example: Groupmuse.com"
+              - label: Ticket sentence prefix
+                name: ticketText
+                widget: string
+                required: false
+                hint: "Example: Tickets were available on"
+          - label: Past Events
+            name: past
+            label_singular: Past Event
+            widget: list
+            summary: "{{fields.title}} — {{fields.dateDisplay}}"
+            fields: *event_fields
