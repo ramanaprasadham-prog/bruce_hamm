@@ -1,6 +1,14 @@
 {
   "emptyMessage": "Coming soon. New concert dates and appearances will be posted here.",
-  "upcoming": [],
+  "upcoming": [
+    {
+      "title": "test title",
+      "dateDisplay": "Saturday, June 27, 2026 · 3:00–7:00 PM",
+      "venue": "test venue",
+      "detail": "test details",
+      "poster": "/images/events/screenshot-2026-02-08-194956.png"
+    }
+  ],
   "past": [
     {
       "title": "Path of Raga",
@@ -12,15 +20,15 @@
       "posterAlt": "Path of Raga — student recital poster"
     },
     {
-      "title": "Joyful Summer Evening of Raga",
-      "date": "2026-05-16",
-      "dateDisplay": "Saturday, May 16, 2026 · 5:30 PM",
-      "venue": "Blacow · Fremont, CA",
-      "detail": "Sitar, Sarod and Tabla — Joanna Mack (sitar), Bruce Hamm (sarod), Amod Dandawate (tabla).",
       "ticketUrl": "https://www.groupmuse.com",
       "ticketLabel": "Groupmuse.com",
-      "ticketText": "Tickets were available on",
       "poster": "images/events/joyful-summer-evening-of-raga.png",
+      "date": "2026-05-16",
+      "venue": "Blacow · Fremont, CA",
+      "detail": "Sitar, Sarod and Tabla — Joanna Mack (sitar), Bruce Hamm (sarod), Amod Dandawate (tabla).",
+      "dateDisplay": "Saturday, May 16, 2026 · 5:30 PM",
+      "title": "Joyful Summer Evening of Raga",
+      "ticketText": "Tickets were available on",
       "posterAlt": "Joyful summer evening of Raga — concert poster"
     }
   ]
