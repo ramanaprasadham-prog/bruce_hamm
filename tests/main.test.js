@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles } from '../js/app.js';
+import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles, initYoutubeEmbeds } from '../js/app.js';
 
 function buildSiteFixture({ withAudio = false, withCanvas = false, withReveal = true } = {}) {
   document.body.innerHTML = `
@@ -346,5 +346,57 @@ describe('initHeroSlider', () => {
 
     vi.advanceTimersByTime(3000);
     expect(slides[2].classList.contains('is-active')).toBe(true);
+  });
+});
+
+describe('initYoutubeEmbeds', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div class="video-lazy" data-youtube-id="abc123" data-youtube-title="Test performance video">
+        <button type="button" class="video-play-btn">Play</button>
+      </div>
+    `;
+  });
+
+  it('replaces the lazy frame with a YouTube iframe on play click', () => {
+    initYoutubeEmbeds();
+
+    document.querySelector('.video-play-btn').click();
+
+    const iframe = document.querySelector('.video-lazy iframe');
+    expect(iframe).toBeTruthy();
+    expect(iframe.src).toContain('youtube-nocookie.com/embed/abc123');
+    expect(iframe.title).toBe('Test performance video');
+    expect(iframe.allowFullscreen).toBe(true);
+  });
+
+  it('includes a start time when data-youtube-start is provided', () => {
+    document.body.innerHTML = `
+      <div class="video-lazy" data-youtube-id="xyz789" data-youtube-start="111" data-youtube-title="Timed video">
+        <button type="button" class="video-play-btn">Play</button>
+      </div>
+    `;
+
+    initYoutubeEmbeds();
+    document.querySelector('.video-play-btn').click();
+
+    expect(document.querySelector('iframe').src).toContain('start=111');
+  });
+
+  it('opens YouTube in a new tab when running from a file URL', () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { protocol: 'file:' },
+    });
+
+    initYoutubeEmbeds();
+    document.querySelector('.video-play-btn').click();
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://www.youtube.com/watch?v=abc123',
+      '_blank',
+      'noopener,noreferrer'
+    );
   });
 });

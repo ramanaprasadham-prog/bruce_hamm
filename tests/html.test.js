@@ -57,9 +57,20 @@ describe('shared site structure', () => {
         });
       });
 
-      it('includes footer year placeholder', () => {
+      it('includes Path of Raga branding in the header', () => {
+        expect(html).toContain('class="brand-text">Path of Raga</span>');
+        expect(html).toContain('src="images/logo.png"');
+        expect(html).toContain('alt="Path of Raga"');
+      });
+
+      it('includes expanded footer with navigation links', () => {
         expect(html).toContain('id="year"');
-        expect(html).toContain('Bruce Hamm');
+        expect(html).toContain('footer-inner');
+        expect(html).toContain('footer-bottom');
+        expect(html).toContain('footer-logo');
+        expect(html).toContain('aria-label="Footer navigation"');
+        expect(html).toContain('href="lessons.html"');
+        expect(html).toContain('href="contact.html"');
       });
     });
   });
@@ -67,6 +78,10 @@ describe('shared site structure', () => {
 
 describe('index.html', () => {
   const html = readPage('index.html');
+
+  it('uses Path of Raga in the page title', () => {
+    expect(html).toContain('<title>Path of Raga — Sarod Virtuoso</title>');
+  });
 
   it('includes hero content and call-to-action links', () => {
     expect(html).toContain('The Art of');
@@ -83,10 +98,32 @@ describe('index.html', () => {
     expect(html).toContain('hero-panel-content');
     expect(html).toContain('hero-panel-stats');
     expect(html).toContain('images/homepage-hero.png');
-    expect(html).toContain('images/homepage-bg/bruce-portrait.png');
+    expect(html).not.toContain('images/homepage-bg/bruce-portrait.png');
     expect(html.indexOf('hero-carousel-wrap')).toBeLessThan(html.indexOf('hero-main'));
     expect(html.indexOf('hero-panel-image')).toBeLessThan(html.indexOf('hero-panel-content'));
     expect(html.indexOf('hero-panel-content')).toBeLessThan(html.indexOf('hero-panel-stats'));
+  });
+
+  it('includes four homepage carousel slides with matching dot controls', () => {
+    expect(html.match(/<figure class="hero-slide/g)?.length).toBe(4);
+    expect(html.match(/<button type="button" class="hero-slider-dot/g)?.length).toBe(4);
+    expect(html).toContain('images/homepage-bg/duo-performance.png');
+    expect(html).toContain('images/homepage-bg/sitar-closeup.png');
+    expect(html).toContain('images/homepage-bg/outdoor-group.png');
+    expect(html).toContain('images/homepage-bg/stage-group.png');
+  });
+});
+
+describe('gallery.html', () => {
+  const html = readPage('gallery.html');
+
+  it('includes studio portrait and other gallery photos', () => {
+    expect(html).toContain('images/gallery/bruce-portrait.png');
+    expect(html).toContain('gallery-item-portrait');
+    expect(html).toContain('images/gallery/ensemble-performance.png');
+    expect(html).toContain('images/gallery/bruce-with-gregg-johnson.png');
+    expect(html).toContain('images/gallery/bruce-with-friend.png');
+    expect(html).toContain('images/gallery/bruce-2016-calcutta.png');
   });
 });
 
@@ -103,8 +140,34 @@ describe('biography.html', () => {
   it('includes collaborator highlights and CTA band', () => {
     expect(html).toContain('Zakir Hussain');
     expect(html).toContain('Swapan Chaudhuri');
+    expect(html).toContain('View Events');
     expect(html).toContain('href="events.html"');
     expect(html).toContain('href="lessons.html"');
+    expect(html).toContain('Learn Sarod and Sitar');
+  });
+});
+
+describe('lessons.html', () => {
+  const html = readPage('lessons.html');
+
+  it('includes teaching biography and group lesson photo', () => {
+    expect(html).toContain('Bruce is an experienced teacher');
+    expect(html).toContain('Ali Akbar Khan College in 1982');
+    expect(html).toContain('private instrumental lessons and vocal lessons');
+    expect(html).toContain('lessons-photo');
+    expect(html).toContain('images/lessons/group-lesson.png');
+    expect(html).toContain('Inquire About Lessons');
+  });
+});
+
+describe('videos.html', () => {
+  const html = readPage('videos.html');
+
+  it('includes embedded performance videos', () => {
+    expect(html).toContain('video-grid');
+    expect(html).toContain('video-card');
+    expect(html).toContain('data-youtube-id');
+    expect(html).toContain('video-play-btn');
   });
 });
 
@@ -183,10 +246,35 @@ describe('contact.html', () => {
   });
 });
 
+describe('page titles', () => {
+  const titles = {
+    'index.html': 'Path of Raga — Sarod Virtuoso',
+    'biography.html': 'Biography — Path of Raga',
+    'gallery.html': 'Gallery — Path of Raga',
+    'music.html': 'Music — Path of Raga',
+    'videos.html': 'Videos — Path of Raga',
+    'events.html': 'Events — Path of Raga',
+    'lessons.html': 'Lessons — Path of Raga',
+    'contact.html': 'Contact — Path of Raga',
+  };
+
+  Object.entries(titles).forEach(([page, title]) => {
+    it(`${page} uses the Path of Raga title`, () => {
+      expect(readPage(page)).toContain(`<title>${title}</title>`);
+    });
+  });
+});
+
 describe('asset files', () => {
   const assets = [
     'images/homepage-hero.png',
-    'images/homepage-bg/bruce-portrait.png',
+    'images/lessons/group-lesson.png',
+    'images/logo.png',
+    'images/gallery/bruce-portrait.png',
+    'images/gallery/ensemble-performance.png',
+    'images/gallery/bruce-with-gregg-johnson.png',
+    'images/gallery/bruce-with-friend.png',
+    'images/gallery/bruce-2016-calcutta.png',
     'images/homepage-bg/duo-performance.png',
     'images/homepage-bg/sitar-closeup.png',
     'images/homepage-bg/outdoor-group.png',

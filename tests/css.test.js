@@ -26,6 +26,11 @@ const requiredSelectors = [
   '.contact-form',
   '.form-group',
   '.cta-band',
+  '.site-footer',
+  '.footer-inner',
+  '.footer-bottom',
+  '.brand-logo',
+  '.lessons-photo',
   '.reveal.visible',
   '.ambient',
   '#particle-canvas',
@@ -60,6 +65,21 @@ describe('styles.css', () => {
     expect(css).toContain('rotateX(16deg)');
     expect(css).toContain('perspective: 1400px');
     expect(css).toContain('@keyframes hero-bg-marquee');
+  });
+
+  it('styles the circular brand logo and footer layout', () => {
+    expect(css).toContain('.brand-logo');
+    expect(css).toContain('border-radius: 50%');
+    expect(css).toContain('.footer-inner');
+    expect(css).toContain('.footer-bottom');
+    expect(css).toContain('.lessons-photo');
+  });
+
+  it('uses masonry-style gallery spacing and portrait framing', () => {
+    expect(css).toContain('.gallery-grid');
+    expect(css).toContain('column-count: 2');
+    expect(css).toContain('.gallery-item-portrait');
+    expect(css).toContain('object-fit: initial');
   });
 
   it('respects reduced motion preferences', () => {

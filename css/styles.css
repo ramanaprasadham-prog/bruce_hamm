@@ -134,8 +134,11 @@ a {
 }
 
 .brand-logo {
-  height: 42px;
-  width: auto;
+  height: 52px;
+  width: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
   filter: brightness(1.1);
 }
 
@@ -1164,13 +1167,13 @@ main {
 }
 
 .gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  column-count: 2;
+  column-gap: 1rem;
 }
 
 .gallery-item {
-  margin: 0;
+  margin: 0 0 1rem;
+  break-inside: avoid;
 }
 
 .gallery-item figcaption {
@@ -1181,23 +1184,31 @@ main {
 }
 
 .gallery-item-wide {
-  grid-column: 1 / -1;
+  column-span: all;
 }
 
 .gallery-item .image-frame img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: auto;
+  display: block;
+  aspect-ratio: auto;
   object-fit: cover;
 }
 
+.gallery-item-portrait .image-frame img {
+  aspect-ratio: auto;
+  height: auto;
+  object-fit: initial;
+}
+
 .gallery-item-wide .image-frame img {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: auto;
 }
 
 .gallery-item-panoramic .image-frame img {
-  aspect-ratio: 600 / 198;
-  object-fit: contain;
-  background: var(--bg-elevated);
+  aspect-ratio: auto;
+  object-fit: cover;
+  background: transparent;
 }
 
 .video-grid {
@@ -1393,6 +1404,15 @@ main {
   margin-bottom: 0;
 }
 
+.lessons-photo {
+  margin-bottom: 1.5rem;
+}
+
+.lessons-photo .image-frame img {
+  aspect-ratio: auto;
+  height: auto;
+}
+
 /* Contact form */
 .contact-form {
   display: grid;
@@ -1465,9 +1485,82 @@ main {
 .site-footer {
   position: relative;
   z-index: 1;
-  padding: 2rem;
-  text-align: center;
+  margin-top: 2rem;
   border-top: 1px solid var(--border);
+  background: rgba(16, 18, 21, 0.72);
+  backdrop-filter: blur(16px);
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 2rem 2rem;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.footer-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.footer-logo {
+  height: 44px;
+  width: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.footer-brand-text {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent-bright);
+}
+
+.footer-tagline {
+  max-width: 28rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.footer-heading {
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+}
+
+.footer-links {
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  transition: color var(--transition);
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 2rem 1.75rem;
+  text-align: center;
   color: var(--text-muted);
   font-size: 0.85rem;
 }
@@ -1613,7 +1706,17 @@ main {
   }
 
   .gallery-grid {
+    column-count: 1;
+  }
+
+  .footer-inner {
     grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.25rem 1.5rem;
+  }
+
+  .footer-bottom {
+    padding: 1.25rem 1.25rem 1.5rem;
   }
 
   .event-list {
