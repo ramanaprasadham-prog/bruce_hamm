@@ -168,6 +168,20 @@ describe('videos.html', () => {
     expect(html).toContain('video-card');
     expect(html).toContain('data-youtube-id');
     expect(html).toContain('video-play-btn');
+    expect(html).toContain('data-youtube-id="Nql_MzalBMY"');
+    expect(html).toContain('https://www.youtube.com/watch?v=Nql_MzalBMY');
+  });
+
+  it('links to Joanna Mack YouTube channel', () => {
+    expect(html).toContain('https://www.youtube.com/@JoannaMack');
+    expect(html).toContain('Joanna Mack on YouTube');
+    expect(html).toContain('images/videos/joanna-mack.png');
+  });
+
+  it('links to Bruce Hamm YouTube channel', () => {
+    expect(html).toContain('https://www.youtube.com/@oobssarode');
+    expect(html).toContain('Bruce Hamm on YouTube');
+    expect(html).toContain('images/gallery/bruce-portrait.png');
   });
 });
 
@@ -269,6 +283,7 @@ describe('asset files', () => {
   const assets = [
     'images/homepage-hero.png',
     'images/lessons/group-lesson.png',
+    'images/videos/joanna-mack.png',
     'images/logo.png',
     'images/gallery/bruce-portrait.png',
     'images/gallery/ensemble-performance.png',
