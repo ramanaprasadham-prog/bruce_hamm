@@ -1,0 +1,9 @@
+node_modules/
+.tools/
+tests/
+scripts/
+package.json
+package-lock.json
+vitest.config.js
+.gitignore
+1-Audio-Track-6.mp3

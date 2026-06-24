@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events — Bruce Hamm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <canvas id="particle-canvas"></canvas>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <img src="https://brucehamm.com/wp-content/uploads/2019/01/bruce-hamm.png" alt="Bruce Hamm" class="brand-logo">
+        <span class="brand-text">Bruce Hamm</span>
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="biography.html" class="nav-link">Biography</a>
+        <a href="gallery.html" class="nav-link">Gallery</a>
+        <a href="music.html" class="nav-link">Music</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="events.html" class="nav-link active">Events</a>
+        <a href="lessons.html" class="nav-link">Lessons</a>
+        <a href="contact.html" class="nav-link nav-cta">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <div class="page-hero-inner">
+        <p class="eyebrow reveal">Live Performances</p>
+        <h1 class="page-title reveal">Events</h1>
+        <p class="page-subtitle reveal">Concerts, appearances, and performances — upcoming and past.</p>
+      </div>
+    </section>
+
+    <section class="page-content page-content-wide">
+      <div class="events-section reveal">
+        <h2 class="events-section-title">Upcoming Events</h2>
+        <div class="events-empty">
+          <p>Coming soon. New concert dates and appearances will be posted here.</p>
+          <p>For booking inquiries, please <a href="contact.html">get in touch</a>.</p>
+        </div>
+      </div>
+
+      <div class="events-section reveal">
+        <h2 class="events-section-title">Past Events</h2>
+        <ul class="event-list">
+          <li class="event-card reveal">
+            <div class="event-poster">
+              <img src="images/events/path-of-raga.png" alt="Path of Raga — student recital poster">
+            </div>
+            <time class="event-date" datetime="2026-06-13">Saturday, June 13, 2026 · 3:00–7:00 PM</time>
+            <h3 class="event-title">Path of Raga</h3>
+            <p class="event-venue">Sri Krishna Balaram Mandir · 680 E Calaveras Blvd, Milpitas, CA 95035</p>
+            <p class="event-detail">Student recital featuring students of Bruce Hamm and Joanna Mack. Free and open to all.</p>
+          </li>
+
+          <li class="event-card reveal">
+            <div class="event-poster">
+              <img src="images/events/joyful-summer-evening-of-raga.png" alt="Joyful summer evening of Raga — concert poster">
+            </div>
+            <time class="event-date" datetime="2026-05-16">Saturday, May 16, 2026 · 5:30 PM</time>
+            <h3 class="event-title">Joyful Summer Evening of Raga</h3>
+            <p class="event-venue">Blacow · Fremont, CA</p>
+            <p class="event-detail">
+              Sitar, Sarod and Tabla — Joanna Mack (sitar), Bruce Hamm (sarod), Amod Dandawate (tabla).
+              Tickets were available on <a href="https://www.groupmuse.com" target="_blank" rel="noopener noreferrer">Groupmuse.com</a>.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Bruce Hamm. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
