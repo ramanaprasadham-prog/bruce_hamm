@@ -110,9 +110,9 @@ describe('buildPastHtml', () => {
   it('renders past events newest first', () => {
     const html = buildPastHtml(eventsData);
 
-    expect(html).toContain('Path of Raga');
+    expect(html).toContain('Bruce Hamm');
     expect(html).toContain('Joyful Summer Evening of Raga');
-    expect(html.indexOf('Path of Raga')).toBeLessThan(html.indexOf('Joyful Summer Evening of Raga'));
+    expect(html.indexOf('Bruce Hamm')).toBeLessThan(html.indexOf('Joyful Summer Evening of Raga'));
   });
 });
 

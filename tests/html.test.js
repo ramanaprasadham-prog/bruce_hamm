@@ -40,7 +40,7 @@ describe('shared site structure', () => {
       });
 
       it('loads shared styles and main javascript', () => {
-        expect(html).toContain('href="css/styles.css"');
+        expect(html).toMatch(/href="css\/styles\.css(?:\?[^"]*)?"/);
         expect(html).toContain('<script src="js/main.js"></script>');
       });
 
@@ -57,17 +57,18 @@ describe('shared site structure', () => {
         });
       });
 
-      it('includes Path of Raga branding in the header', () => {
-        expect(html).toContain('class="brand-text">Path of Raga</span>');
-        expect(html).toContain('src="images/logo.png"');
-        expect(html).toContain('alt="Path of Raga"');
+      it('includes Bruce Hamm branding in the header', () => {
+        expect(html).toContain('class="brand-text">Bruce Hamm</span>');
+        expect(html).not.toContain('brand-logo');
+        expect(html).not.toContain('src="images/logo.png"');
       });
 
       it('includes expanded footer with navigation links', () => {
         expect(html).toContain('id="year"');
         expect(html).toContain('footer-inner');
         expect(html).toContain('footer-bottom');
-        expect(html).toContain('footer-logo');
+        expect(html).toContain('footer-brand-text');
+        expect(html).not.toContain('footer-logo');
         expect(html).toContain('aria-label="Footer navigation"');
         expect(html).toContain('href="lessons.html"');
         expect(html).toContain('href="contact.html"');
@@ -79,8 +80,8 @@ describe('shared site structure', () => {
 describe('index.html', () => {
   const html = readPage('index.html');
 
-  it('uses Path of Raga in the page title', () => {
-    expect(html).toContain('<title>Path of Raga — Sarod Virtuoso</title>');
+  it('uses Bruce Hamm in the page title', () => {
+    expect(html).toContain('<title>Bruce Hamm — Sarod Virtuoso</title>');
   });
 
   it('includes hero content and call-to-action links', () => {
@@ -90,27 +91,30 @@ describe('index.html', () => {
   });
 
   it('includes hero stats, carousel above featured photo', () => {
-    expect(html).toContain('class="hero-stats"');
     expect(html).toContain('hero-carousel-wrap');
     expect(html).toContain('hero-slider');
     expect(html).toContain('hero-main');
     expect(html).toContain('hero-main-row');
     expect(html).toContain('hero-panel-content');
     expect(html).toContain('hero-panel-stats');
-    expect(html).toContain('images/homepage-hero.png');
-    expect(html).not.toContain('images/homepage-bg/bruce-portrait.png');
+    expect(html).not.toContain('class="hero-stats"');
+    expect(html).not.toContain('images/homepage-hero.png');
+    expect(html).not.toContain('hero-panel-image');
     expect(html.indexOf('hero-carousel-wrap')).toBeLessThan(html.indexOf('hero-main'));
-    expect(html.indexOf('hero-panel-image')).toBeLessThan(html.indexOf('hero-panel-content'));
     expect(html.indexOf('hero-panel-content')).toBeLessThan(html.indexOf('hero-panel-stats'));
   });
 
   it('includes four homepage carousel slides with matching dot controls', () => {
     expect(html.match(/<figure class="hero-slide/g)?.length).toBe(4);
     expect(html.match(/<button type="button" class="hero-slider-dot/g)?.length).toBe(4);
-    expect(html).toContain('images/homepage-bg/duo-performance.png');
-    expect(html).toContain('images/homepage-bg/sitar-closeup.png');
-    expect(html).toContain('images/homepage-bg/outdoor-group.png');
-    expect(html).toContain('images/homepage-bg/stage-group.png');
+    expect(html).toContain('images/homepage-bg/Bruce_2017_GMC.jpg');
+    expect(html).toContain('images/homepage-bg/Bruce_Kolkata_2019.jpg');
+    expect(html).toContain('images/homepage-bg/Bruce_Baba_1.jpg');
+    expect(html).toContain('images/homepage-bg/Doordharshan_Mix_3.jpg');
+    expect(html).not.toContain('images/homepage-bg/outdoor-group.png');
+    expect(html).not.toContain('images/homepage-bg/duo-performance.png');
+    expect(html).not.toContain('images/homepage-bg/sitar-closeup.png');
+    expect(html).not.toContain('images/homepage-bg/stage-group.png');
   });
 });
 
@@ -168,14 +172,8 @@ describe('videos.html', () => {
     expect(html).toContain('video-card');
     expect(html).toContain('data-youtube-id');
     expect(html).toContain('video-play-btn');
-    expect(html).toContain('data-youtube-id="Nql_MzalBMY"');
-    expect(html).toContain('https://www.youtube.com/watch?v=Nql_MzalBMY');
-  });
-
-  it('links to Joanna Mack YouTube channel', () => {
-    expect(html).toContain('https://www.youtube.com/@JoannaMack');
-    expect(html).toContain('Joanna Mack on YouTube');
-    expect(html).toContain('images/videos/joanna-mack.png');
+    expect(html).toContain('data-youtube-id="_OTR5QUcVR8"');
+    expect(html).toContain('https://www.youtube.com/watch?v=_OTR5QUcVR8&t=111s');
   });
 
   it('links to Bruce Hamm YouTube channel', () => {
@@ -260,18 +258,18 @@ describe('contact.html', () => {
 
 describe('page titles', () => {
   const titles = {
-    'index.html': 'Path of Raga — Sarod Virtuoso',
-    'biography.html': 'Biography — Path of Raga',
-    'gallery.html': 'Gallery — Path of Raga',
-    'music.html': 'Music — Path of Raga',
-    'videos.html': 'Videos — Path of Raga',
-    'events.html': 'Events — Path of Raga',
-    'lessons.html': 'Lessons — Path of Raga',
-    'contact.html': 'Contact — Path of Raga',
+    'index.html': 'Bruce Hamm — Sarod Virtuoso',
+    'biography.html': 'Biography — Bruce Hamm',
+    'gallery.html': 'Gallery — Bruce Hamm',
+    'music.html': 'Music — Bruce Hamm',
+    'videos.html': 'Videos — Bruce Hamm',
+    'events.html': 'Events — Bruce Hamm',
+    'lessons.html': 'Lessons — Bruce Hamm',
+    'contact.html': 'Contact — Bruce Hamm',
   };
 
   Object.entries(titles).forEach(([page, title]) => {
-    it(`${page} uses the Path of Raga title`, () => {
+    it(`${page} uses the Bruce Hamm title`, () => {
       expect(readPage(page)).toContain(`<title>${title}</title>`);
     });
   });
@@ -279,19 +277,16 @@ describe('page titles', () => {
 
 describe('asset files', () => {
   const assets = [
-    'images/homepage-hero.png',
     'images/lessons/group-lesson.png',
-    'images/videos/joanna-mack.png',
-    'images/logo.png',
     'images/gallery/bruce-portrait.png',
     'images/gallery/ensemble-performance.png',
     'images/gallery/bruce-with-gregg-johnson.png',
     'images/gallery/bruce-with-friend.png',
     'images/gallery/bruce-2016-calcutta.png',
-    'images/homepage-bg/duo-performance.png',
-    'images/homepage-bg/sitar-closeup.png',
-    'images/homepage-bg/outdoor-group.png',
-    'images/homepage-bg/stage-group.png',
+    'images/homepage-bg/Bruce_2017_GMC.jpg',
+    'images/homepage-bg/Bruce_Kolkata_2019.jpg',
+    'images/homepage-bg/Bruce_Baba_1.jpg',
+    'images/homepage-bg/Doordharshan_Mix_3.jpg',
     'content/events.json',
     'admin/config.yml',
     'admin/index.html',

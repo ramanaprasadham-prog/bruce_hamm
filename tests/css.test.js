@@ -29,7 +29,6 @@ const requiredSelectors = [
   '.site-footer',
   '.footer-inner',
   '.footer-bottom',
-  '.brand-logo',
   '.lessons-photo',
   '.reveal.visible',
   '.ambient',
@@ -67,9 +66,7 @@ describe('styles.css', () => {
     expect(css).toContain('@keyframes hero-bg-marquee');
   });
 
-  it('styles the circular brand logo and footer layout', () => {
-    expect(css).toContain('.brand-logo');
-    expect(css).toContain('border-radius: 50%');
+  it('styles the footer layout and lessons photo', () => {
     expect(css).toContain('.footer-inner');
     expect(css).toContain('.footer-bottom');
     expect(css).toContain('.lessons-photo');
