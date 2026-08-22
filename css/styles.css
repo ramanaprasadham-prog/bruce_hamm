@@ -773,6 +773,11 @@ main {
   grid-template-columns: 1.2fr 0.8fr;
   gap: 3.5rem;
   align-items: start;
+  overflow: visible;
+}
+
+.bio-sidebar {
+  overflow: visible;
 }
 
 .bio-block {
@@ -826,6 +831,28 @@ main {
 
 .bio-image-card {
   margin-bottom: 1.5rem;
+}
+
+.bio-image-card-wide {
+  width: 100%;
+  margin-left: 0;
+}
+
+.bio-image-card-wide .image-frame {
+  line-height: 0;
+}
+
+.bio-image-card-wide .image-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: unset;
+  object-position: center;
+}
+
+.bio-image-card-wide .image-frame:hover img {
+  transform: none;
 }
 
 .bio-image-card figcaption {
@@ -1637,6 +1664,12 @@ main {
 
   .bio-sidebar {
     order: -1;
+    overflow: visible;
+  }
+
+  .bio-image-card-wide {
+    width: 100%;
+    margin-left: 0;
   }
 }
 

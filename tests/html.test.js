@@ -135,15 +135,27 @@ describe('biography.html', () => {
   const html = readPage('biography.html');
 
   it('includes timeline biography blocks', () => {
-    expect(html).toContain('Beginnings at Ali Akbar College');
+    expect(html).toContain('Roots');
+    expect(html).toContain('Charles Hamm');
+    expect(html).toContain('Stu Hamm');
+    expect(html).toContain('Indian Classical Music');
+    expect(html).toContain('Ali Akbar College');
     expect(html).toContain('Formal Discipleship');
+    expect(html).toContain('Gandha Bandhan');
     expect(html).toContain('Performances &amp; Collaborations');
     expect(html).toContain('Continuing the Legacy');
+    expect(html).toContain('Path of Raga');
+    expect(html).toContain('Maihar Gharana');
   });
 
-  it('includes collaborator highlights and CTA band', () => {
+  it('includes sidebar highlights and CTA band', () => {
+    expect(html).not.toContain('Notable Collaborators');
+    expect(html).not.toContain('bio-artists');
+    expect(html).toContain('images/gallery/doordharshan-ensemble.jpg');
+    expect(html).toContain('Ali Akbar Khan, Buddhdev Dasgupta, Dhyanesh Khan, Supriyo Banerjee, Bruce Hamm');
     expect(html).toContain('Zakir Hussain');
     expect(html).toContain('Swapan Chaudhuri');
+    expect(html).toContain('US, Europe and India');
     expect(html).toContain('View Events');
     expect(html).toContain('href="events.html"');
     expect(html).toContain('href="lessons.html"');
@@ -283,6 +295,7 @@ describe('asset files', () => {
     'images/gallery/bruce-with-gregg-johnson.png',
     'images/gallery/bruce-with-friend.png',
     'images/gallery/bruce-2016-calcutta.png',
+    'images/gallery/doordharshan-ensemble.jpg',
     'images/homepage-bg/Bruce_2017_GMC.jpg',
     'images/homepage-bg/Bruce_Kolkata_2019.jpg',
     'images/homepage-bg/Bruce_Baba_1.jpg',
