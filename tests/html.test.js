@@ -152,6 +152,9 @@ describe('biography.html', () => {
   it('includes sidebar highlights and CTA band', () => {
     expect(html).not.toContain('Notable Collaborators');
     expect(html).not.toContain('bio-artists');
+    expect(html).not.toContain("Collaborations with India's leading artists");
+    expect(html).toContain('href="https://pathofraga.org"');
+    expect(html).toContain('Path of Raga Foundation');
     expect(html).toContain('images/gallery/doordharshan-ensemble.jpg');
     expect(html).toContain('Ali Akbar Khan, Buddhdev Dasgupta, Dhyanesh Khan, Supriyo Banerjee, Bruce Hamm');
     expect(html).toContain('Zakir Hussain');
