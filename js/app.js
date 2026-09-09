@@ -92,63 +92,62 @@ export function initApp() {
 }
 
 export function initHeroSlider() {
-  const slider = document.querySelector('.hero-slider');
-  if (!slider) return;
+  document.querySelectorAll('.hero-slider').forEach((slider) => {
+    const slides = Array.from(slider.querySelectorAll('.hero-slide'));
+    const dots = Array.from(slider.querySelectorAll('.hero-slider-dot'));
+    if (!slides.length || slides.length !== dots.length) return;
 
-  const slides = Array.from(slider.querySelectorAll('.hero-slide'));
-  const dots = Array.from(slider.querySelectorAll('.hero-slider-dot'));
-  if (!slides.length || slides.length !== dots.length) return;
+    let activeIndex = slides.findIndex((slide) => slide.classList.contains('is-active'));
+    if (activeIndex < 0) activeIndex = 0;
 
-  let activeIndex = slides.findIndex((slide) => slide.classList.contains('is-active'));
-  if (activeIndex < 0) activeIndex = 0;
+    let timerId = null;
+    const interval = Number(slider.dataset.autoplay) || 6000;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let timerId = null;
-  const interval = Number(slider.dataset.autoplay) || 6000;
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function showSlide(index) {
+      activeIndex = (index + slides.length) % slides.length;
 
-  function showSlide(index) {
-    activeIndex = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === activeIndex);
+      });
 
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('is-active', i === activeIndex);
-    });
-
-    dots.forEach((dot, i) => {
-      const isActive = i === activeIndex;
-      dot.classList.toggle('is-active', isActive);
-      dot.setAttribute('aria-selected', String(isActive));
-    });
-  }
-
-  function stopAutoplay() {
-    if (timerId) {
-      window.clearInterval(timerId);
-      timerId = null;
+      dots.forEach((dot, i) => {
+        const isActive = i === activeIndex;
+        dot.classList.toggle('is-active', isActive);
+        dot.setAttribute('aria-selected', String(isActive));
+      });
     }
-  }
 
-  function startAutoplay() {
-    stopAutoplay();
-    if (prefersReduced || interval <= 0) return;
-    timerId = window.setInterval(() => {
-      showSlide(activeIndex + 1);
-    }, interval);
-  }
+    function stopAutoplay() {
+      if (timerId) {
+        window.clearInterval(timerId);
+        timerId = null;
+      }
+    }
 
-  dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-      showSlide(index);
-      startAutoplay();
+    function startAutoplay() {
+      stopAutoplay();
+      if (prefersReduced || interval <= 0) return;
+      timerId = window.setInterval(() => {
+        showSlide(activeIndex + 1);
+      }, interval);
+    }
+
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+        startAutoplay();
+      });
     });
+
+    slider.addEventListener('mouseenter', stopAutoplay);
+    slider.addEventListener('mouseleave', startAutoplay);
+    slider.addEventListener('focusin', stopAutoplay);
+    slider.addEventListener('focusout', startAutoplay);
+
+    showSlide(activeIndex);
+    startAutoplay();
   });
-
-  slider.addEventListener('mouseenter', stopAutoplay);
-  slider.addEventListener('mouseleave', startAutoplay);
-  slider.addEventListener('focusin', stopAutoplay);
-  slider.addEventListener('focusout', startAutoplay);
-
-  showSlide(activeIndex);
-  startAutoplay();
 }
 
 const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';

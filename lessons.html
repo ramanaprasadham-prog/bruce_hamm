@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=20260908l">
 </head>
 <body>
   <div class="ambient" aria-hidden="true">
@@ -50,15 +50,52 @@
     </section>
 
     <section class="page-content page-content-wide">
-      <figure class="lessons-photo reveal">
-        <div class="image-frame">
-          <img
-            src="images/lessons/group-lesson.png"
-            alt="Bruce Hamm teaching a group music lesson with students seated on a rug, surrounded by sitars and harmoniums"
-          >
-          <div class="frame-glow"></div>
+      <div class="lessons-carousel-wrap">
+        <div class="hero-slider reveal" data-autoplay="6000">
+          <div class="hero-slider-viewport">
+            <div class="hero-slider-track">
+              <figure class="hero-slide is-active">
+                <div class="carousel-slide-frame">
+                  <img
+                    src="images/lessons/student-collage-2026.jpg"
+                    alt="Collage of Bruce Hamm's students performing and studying sarod, sitar, and tabla"
+                  >
+                </div>
+              </figure>
+              <figure class="hero-slide">
+                <div class="carousel-slide-frame">
+                  <img
+                    src="images/lessons/class-boys-2019.jpg"
+                    alt="Group music lesson with students playing sitar and tabla alongside Bruce Hamm and Joanna Mack"
+                  >
+                </div>
+              </figure>
+              <figure class="hero-slide">
+                <div class="carousel-slide-frame">
+                  <img
+                    src="images/lessons/group-lesson.jpg"
+                    alt="Bruce Hamm with a young student beside a portrait of Ustad Ali Akbar Khan"
+                  >
+                </div>
+              </figure>
+              <figure class="hero-slide">
+                <div class="carousel-slide-frame">
+                  <img
+                    src="images/lessons/teaching-vedika.jpg"
+                    alt="Bruce Hamm teaching a student sarod one on one"
+                  >
+                </div>
+              </figure>
+            </div>
+          </div>
+          <div class="hero-slider-dots" role="tablist" aria-label="Lessons photo gallery">
+            <button type="button" class="hero-slider-dot is-active" aria-label="Show photo 1" aria-selected="true"></button>
+            <button type="button" class="hero-slider-dot" aria-label="Show photo 2" aria-selected="false"></button>
+            <button type="button" class="hero-slider-dot" aria-label="Show photo 3" aria-selected="false"></button>
+            <button type="button" class="hero-slider-dot" aria-label="Show photo 4" aria-selected="false"></button>
+          </div>
         </div>
-      </figure>
+      </div>
 
       <div class="content-card reveal">
         <p>

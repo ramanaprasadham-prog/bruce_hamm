@@ -29,7 +29,6 @@ const requiredSelectors = [
   '.site-footer',
   '.footer-inner',
   '.footer-bottom',
-  '.lessons-photo',
   '.reveal.visible',
   '.ambient',
   '#particle-canvas',
@@ -66,10 +65,9 @@ describe('styles.css', () => {
     expect(css).toContain('@keyframes hero-bg-marquee');
   });
 
-  it('styles the footer layout and lessons photo', () => {
+  it('styles the footer layout', () => {
     expect(css).toContain('.footer-inner');
     expect(css).toContain('.footer-bottom');
-    expect(css).toContain('.lessons-photo');
   });
 
   it('uses masonry-style gallery spacing and portrait framing', () => {

@@ -105,6 +105,7 @@ describe('index.html', () => {
   });
 
   it('includes four homepage carousel slides with matching dot controls', () => {
+    expect(html).toContain('carousel-slide-frame');
     expect(html.match(/<figure class="hero-slide/g)?.length).toBe(4);
     expect(html.match(/<button type="button" class="hero-slider-dot/g)?.length).toBe(4);
     expect(html).toContain('images/homepage-bg/Bruce_2017_GMC.jpg');
@@ -166,12 +167,22 @@ describe('biography.html', () => {
 describe('lessons.html', () => {
   const html = readPage('lessons.html');
 
-  it('includes teaching biography and group lesson photo', () => {
+  it('includes teaching carousel photos, biography, and inquiry CTA', () => {
+    expect(html).toContain('lessons-carousel-wrap');
+    expect(html).toContain('carousel-slide-frame');
+    expect(html).toContain('hero-slider');
+    expect(html).toContain('hero-slider-dots');
+    expect(html).toMatch(/<figure class="hero-slide/g);
+    expect(html.match(/<figure class="hero-slide/g)?.length).toBe(4);
+    expect(html.match(/<button type="button" class="hero-slider-dot/g)?.length).toBe(4);
+    expect(html).toContain('images/lessons/student-collage-2026.jpg');
+    expect(html).toContain('images/lessons/teaching-vedika.jpg');
+    expect(html).toContain('images/lessons/class-boys-2019.jpg');
+    expect(html).toContain('images/lessons/group-lesson.jpg');
     expect(html).toContain('Bruce is an experienced teacher');
     expect(html).toContain('Ali Akbar Khan College in 1982');
     expect(html).toContain('private instrumental lessons and vocal lessons');
-    expect(html).toContain('lessons-photo');
-    expect(html).toContain('images/lessons/group-lesson.png');
+    expect(html).not.toContain('images/lessons/group-lesson.png');
     expect(html).toContain('Inquire About Lessons');
   });
 });
@@ -289,7 +300,10 @@ describe('page titles', () => {
 
 describe('asset files', () => {
   const assets = [
-    'images/lessons/group-lesson.png',
+    'images/lessons/student-collage-2026.jpg',
+    'images/lessons/teaching-vedika.jpg',
+    'images/lessons/class-boys-2019.jpg',
+    'images/lessons/group-lesson.jpg',
     'images/gallery/bruce-portrait.png',
     'images/gallery/ensemble-performance.png',
     'images/gallery/bruce-with-gregg-johnson.png',
