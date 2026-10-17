@@ -122,13 +122,32 @@ describe('index.html', () => {
 describe('gallery.html', () => {
   const html = readPage('gallery.html');
 
-  it('includes studio portrait and other gallery photos', () => {
-    expect(html).toContain('images/gallery/bruce-portrait.png');
-    expect(html).toContain('gallery-item-portrait');
-    expect(html).toContain('images/gallery/ensemble-performance.png');
-    expect(html).toContain('images/gallery/bruce-with-gregg-johnson.png');
-    expect(html).toContain('images/gallery/bruce-with-friend.png');
-    expect(html).toContain('images/gallery/bruce-2016-calcutta.png');
+  it('shows the Baba ensemble photo first, then the new gallery photos in order', () => {
+    const photos = [
+      'images/gallery/bruce-baba-1-cropped.jpg',
+      'images/gallery/bruce-with-swapan-da.png',
+      'images/gallery/img-3440.jpg',
+      'images/gallery/bruce-at-ali-akbar-college.jpg',
+      'images/gallery/sarod-class-80s.jpg',
+      'images/gallery/bruce-and-samir.jpg',
+      'images/gallery/bruce-2016-calcutta.jpg',
+      'images/gallery/bruce-with-gregg-johnson.png',
+      'images/gallery/jabalpur.jpg',
+      'images/gallery/alladuin-fes-aak.jpg',
+    ];
+
+    expect(html).toContain('class="gallery-grid"');
+    photos.forEach((src, index) => {
+      expect(html).toContain(src);
+      if (index > 0) {
+        expect(html.indexOf(src)).toBeGreaterThan(html.indexOf(photos[index - 1]));
+      }
+    });
+    expect(html).not.toContain('images/gallery/bruce-portrait.png');
+    expect(html).not.toContain('images/gallery/ensemble-performance.png');
+    expect(html).not.toContain('images/gallery/bruce-with-friend.png');
+    expect(html).not.toContain('images/gallery/bruce-2016-calcutta.png');
+    expect(html).not.toContain('Alladuin-Fes-AAK_SC_GR_BH_cropped-1-1024x604.jpg');
   });
 });
 
@@ -307,6 +326,15 @@ describe('asset files', () => {
     'images/lessons/teaching-vedika.jpg',
     'images/lessons/class-boys-2019.jpg',
     'images/lessons/group-lesson.jpg',
+    'images/gallery/bruce-baba-1-cropped.jpg',
+    'images/gallery/bruce-with-swapan-da.png',
+    'images/gallery/img-3440.jpg',
+    'images/gallery/bruce-at-ali-akbar-college.jpg',
+    'images/gallery/sarod-class-80s.jpg',
+    'images/gallery/bruce-and-samir.jpg',
+    'images/gallery/bruce-2016-calcutta.jpg',
+    'images/gallery/jabalpur.jpg',
+    'images/gallery/alladuin-fes-aak.jpg',
     'images/gallery/bruce-portrait.png',
     'images/gallery/ensemble-performance.png',
     'images/gallery/bruce-with-gregg-johnson.png',
