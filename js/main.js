@@ -91,6 +91,160 @@
   initParticles();
   initContactForm();
   initHeroSlider();
+  initSiteSearch();
+
+  const SITE_SEARCH_PAGES = [
+    {
+      title: 'Home',
+      url: 'index.html',
+      snippet: 'Sarod virtuoso, performer and teacher in the California Bay Area.',
+      keywords: 'bruce hamm sarod sitar virtuoso ali akbar khan homepage',
+    },
+    {
+      title: 'Biography',
+      url: 'biography.html',
+      snippet: 'Disciple of Ustad Ali Akbar Khan, performer, and teacher of the Maihar Gharana.',
+      keywords: 'biography disciple ali akbar khan aacm gandha bandhan zakir hussain swapan chaudhuri path of raga stu hamm charles hamm',
+    },
+    {
+      title: 'Gallery',
+      url: 'gallery.html',
+      snippet: 'Performance photos and archival images from decades on stage.',
+      keywords: 'gallery photos images allaudin festival calcutta jabalpur swapan concert',
+    },
+    {
+      title: 'Music',
+      url: 'music.html',
+      snippet: 'Listen to Morning Ragas, Evening Ragas, and other sarod recordings.',
+      keywords: 'music recordings morning ragas evening ragas chandranandan jogia kalengra audio tracks',
+    },
+    {
+      title: 'Videos',
+      url: 'videos.html',
+      snippet: 'Watch concert footage and performances on YouTube.',
+      keywords: 'videos youtube performance concert rag marwa chandranandan',
+    },
+    {
+      title: 'Events',
+      url: 'events.html',
+      snippet: 'Upcoming concerts and past appearances.',
+      keywords: 'events concerts schedule upcoming past appearances',
+    },
+    {
+      title: 'Lessons',
+      url: 'lessons.html',
+      snippet: 'Private instrumental lessons and vocal study in North Indian classical music.',
+      keywords: 'lessons teaching students sarod sitar vocal class private lessons',
+    },
+    {
+      title: 'Contact',
+      url: 'contact.html',
+      snippet: 'Reach out for performances, lessons, or general inquiries.',
+      keywords: 'contact email inquire booking performances form',
+    },
+  ];
+
+  function searchSite(query) {
+    const terms = String(query || '')
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (!terms.length) return [];
+
+    return SITE_SEARCH_PAGES.map((page) => {
+      const haystack = `${page.title} ${page.snippet} ${page.keywords}`.toLowerCase();
+      if (!terms.every((term) => haystack.includes(term))) return null;
+      const score = terms.reduce((sum, term) => {
+        if (page.title.toLowerCase().includes(term)) return sum + 3;
+        if (page.snippet.toLowerCase().includes(term)) return sum + 2;
+        return sum + 1;
+      }, 0);
+      return { title: page.title, url: page.url, snippet: page.snippet, score };
+    })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
+  }
+
+  function initSiteSearch() {
+    const form = document.querySelector('.site-search');
+    if (!form) return;
+
+    const input = form.querySelector('.site-search-input');
+    const resultsEl = form.querySelector('.site-search-results');
+    if (!input || !resultsEl) return;
+
+    function hideResults() {
+      resultsEl.hidden = true;
+      resultsEl.innerHTML = '';
+    }
+
+    function showResults(query) {
+      const matches = searchSite(query);
+      resultsEl.innerHTML = '';
+
+      if (!String(query || '').trim()) {
+        hideResults();
+        return;
+      }
+
+      if (!matches.length) {
+        const empty = document.createElement('p');
+        empty.className = 'site-search-empty';
+        empty.textContent = 'No matching pages.';
+        resultsEl.appendChild(empty);
+        resultsEl.hidden = false;
+        return;
+      }
+
+      matches.forEach((match) => {
+        const link = document.createElement('a');
+        link.className = 'site-search-result';
+        link.href = match.url;
+        link.setAttribute('role', 'option');
+
+        const title = document.createElement('strong');
+        title.textContent = match.title;
+        const snippet = document.createElement('span');
+        snippet.textContent = match.snippet;
+
+        link.appendChild(title);
+        link.appendChild(snippet);
+        resultsEl.appendChild(link);
+      });
+
+      resultsEl.hidden = false;
+    }
+
+    input.addEventListener('input', () => {
+      showResults(input.value);
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.value.trim()) showResults(input.value);
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const matches = searchSite(input.value);
+      if (matches[0]) {
+        window.location.href = matches[0].url;
+      } else {
+        showResults(input.value);
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!form.contains(event.target)) hideResults();
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        hideResults();
+        input.blur();
+      }
+    });
+  }
 
   const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';
 

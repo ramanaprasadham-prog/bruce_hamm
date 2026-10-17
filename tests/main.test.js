@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles, initYoutubeEmbeds } from '../js/app.js';
+import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles, initYoutubeEmbeds, searchSite } from '../js/app.js';
 
 function buildSiteFixture({ withAudio = false, withCanvas = false, withReveal = true } = {}) {
   document.body.innerHTML = `
@@ -12,6 +12,11 @@ function buildSiteFixture({ withAudio = false, withCanvas = false, withReveal = 
       <a href="music.html" class="nav-link">Music</a>
       <a href="contact.html" class="nav-link nav-cta">Contact</a>
     </nav>
+    <form class="site-search" role="search">
+      <input class="site-search-input" type="search" name="q">
+      <button class="site-search-submit" type="submit" aria-label="Search"></button>
+      <div class="site-search-results" hidden></div>
+    </form>
     ${withReveal ? '<p class="reveal">Reveal item</p><p class="reveal">Reveal item 2</p>' : ''}
     ${withCanvas ? '<canvas id="particle-canvas"></canvas>' : ''}
     ${withAudio ? '<audio id="a1"></audio><audio id="a2"></audio>' : ''}
@@ -142,6 +147,48 @@ describe('initApp', () => {
     expect(reveals[1].style.transitionDelay).toBe('0.08s');
 
     vi.restoreAllMocks();
+  });
+});
+
+describe('searchSite', () => {
+  it('returns matching pages for a query', () => {
+    const results = searchSite('lessons');
+    expect(results.some((page) => page.url === 'lessons.html')).toBe(true);
+  });
+
+  it('returns an empty list for blank queries', () => {
+    expect(searchSite('   ')).toEqual([]);
+  });
+
+  it('ranks title matches above keyword matches', () => {
+    const results = searchSite('music');
+    expect(results[0].url).toBe('music.html');
+  });
+});
+
+describe('initSiteSearch', () => {
+  it('shows matching results as the query is typed', () => {
+    buildSiteFixture();
+    initApp();
+
+    const input = document.querySelector('.site-search-input');
+    input.value = 'gallery';
+    input.dispatchEvent(new Event('input'));
+
+    const results = document.querySelector('.site-search-results');
+    expect(results.hidden).toBe(false);
+    expect(results.textContent).toContain('Gallery');
+  });
+
+  it('shows an empty message when nothing matches', () => {
+    buildSiteFixture();
+    initApp();
+
+    const input = document.querySelector('.site-search-input');
+    input.value = 'xyzzy';
+    input.dispatchEvent(new Event('input'));
+
+    expect(document.querySelector('.site-search-empty').textContent).toBe('No matching pages.');
   });
 });
 

@@ -13,6 +13,8 @@ const sharedBehaviorSnippets = [
   'initParticles();',
   'initContactForm();',
   'initHeroSlider();',
+  'initSiteSearch();',
+  'No matching pages.',
   'https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0${startParam}',
   'Thank you — your message has been sent.',
   'slides.length !== dots.length) return',
@@ -34,7 +36,7 @@ describe('site javascript sources', () => {
 
     pages.forEach((page) => {
       const html = readFileSync(resolve(root, page), 'utf8');
-      expect(html).toContain('<script src="js/main.js"></script>');
+      expect(html).toMatch(/<script src="js\/main\.js(?:\?[^"]*)?"><\/script>/);
     });
   });
 

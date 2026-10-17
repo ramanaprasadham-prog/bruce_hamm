@@ -9,6 +9,9 @@ const requiredSelectors = [
   '.site-header.scrolled',
   '.site-nav',
   '.site-nav.open',
+  '.site-search',
+  '.site-search-input',
+  '.site-search-results',
   '.nav-toggle',
   '.hero',
   '.page-hero',
@@ -70,11 +73,12 @@ describe('styles.css', () => {
     expect(css).toContain('.footer-bottom');
   });
 
-  it('uses masonry-style gallery spacing and portrait framing', () => {
+  it('uses a symmetrical two-column gallery grid', () => {
     expect(css).toContain('.gallery-grid');
-    expect(css).toContain('column-count: 2');
+    expect(css).toContain('grid-template-columns: 1fr 1fr');
+    expect(css).toContain('grid-column: 1 / -1');
     expect(css).toContain('.gallery-item-portrait');
-    expect(css).toContain('object-fit: initial');
+    expect(css).toContain('aspect-ratio: 4 / 3');
   });
 
   it('respects reduced motion preferences', () => {

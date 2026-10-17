@@ -41,7 +41,7 @@ describe('shared site structure', () => {
 
       it('loads shared styles and main javascript', () => {
         expect(html).toMatch(/href="css\/styles\.css(?:\?[^"]*)?"/);
-        expect(html).toContain('<script src="js/main.js"></script>');
+        expect(html).toMatch(/<script src="js\/main\.js(?:\?[^"]*)?"><\/script>/);
       });
 
       it('includes ambient background and site header', () => {
@@ -49,6 +49,13 @@ describe('shared site structure', () => {
         expect(html).toContain('id="particle-canvas"');
         expect(html).toContain('class="site-header"');
         expect(html).toContain('class="site-nav"');
+      });
+
+      it('includes a header search form', () => {
+        expect(html).toContain('class="site-search"');
+        expect(html).toContain('class="site-search-input"');
+        expect(html).toContain('role="search"');
+        expect(html).toContain('class="site-search-results"');
       });
 
       it('includes full primary navigation', () => {
