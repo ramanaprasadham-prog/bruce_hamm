@@ -1,0 +1,14 @@
+/*
+Theme Name: Bruce Hamm
+Theme URI: https://brucehamm.com
+Author: Bruce Hamm
+Description: WordPress theme transferred from the Bruce Hamm static site. Activate it, then visit Settings → Permalinks and click Save. The theme creates the site pages and seeds past events on first activation.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.8
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+Text Domain: bruce-hamm
+*/
+
+/* Front-end styles live in assets/css/styles.css and are enqueued by functions.php. */
