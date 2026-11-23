@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
@@ -6,6 +6,7 @@ import {
   buildEventCard,
   buildPastHtml,
   buildUpcomingHtml,
+  initEventsPage,
 } from '../js/events-page.js';
 
 const root = resolve(import.meta.dirname, '..');
@@ -113,6 +114,56 @@ describe('buildPastHtml', () => {
     expect(html).toContain('Bruce Hamm');
     expect(html).toContain('Joyful Summer Evening of Raga');
     expect(html.indexOf('Bruce Hamm')).toBeLessThan(html.indexOf('Joyful Summer Evening of Raga'));
+  });
+
+  it('shows an empty message when no past events exist', () => {
+    expect(buildPastHtml({ past: [] })).toContain('No past events listed yet.');
+  });
+});
+
+describe('initEventsPage', () => {
+  const recital = {
+    title: 'Student Recital',
+    date: '2026-06-13',
+    dateDisplay: 'Saturday, June 13, 2026',
+    venue: 'Milpitas, CA',
+    detail: 'Students of Bruce Hamm.',
+  };
+
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="events-upcoming"></div>
+      <div id="events-past"></div>
+    `;
+  });
+
+  it('renders upcoming and past events from the events file', async () => {
+    await initEventsPage({
+      referenceDate: new Date(2026, 5, 1),
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({
+          emptyMessage: 'Coming soon.',
+          upcoming: [recital],
+          past: [],
+        }),
+      }),
+    });
+
+    expect(document.getElementById('events-upcoming').textContent).toContain('Student Recital');
+    expect(document.getElementById('events-past').textContent).toContain('No past events listed yet.');
+    expect(document.querySelector('#events-upcoming .reveal').classList.contains('visible')).toBe(true);
+  });
+
+  it('shows a fallback message when the events file cannot be loaded', async () => {
+    await initEventsPage({
+      fetchImpl: async () => {
+        throw new Error('offline');
+      },
+    });
+
+    expect(document.getElementById('events-upcoming').textContent).toContain('temporarily unavailable');
+    expect(document.getElementById('events-past').textContent).toContain('Unable to load past events.');
   });
 });
 

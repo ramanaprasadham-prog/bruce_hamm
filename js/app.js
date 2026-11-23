@@ -143,26 +143,205 @@ export const SITE_SEARCH_PAGES = [
   },
 ];
 
-export function searchSite(query) {
-  const terms = String(query || '')
+export function textFromPageHtml(html) {
+  const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+  const main = doc.querySelector('main');
+  return main ? textFromMainElement(main) : '';
+}
+
+function textFromMainElement(main) {
+  const copy = main.cloneNode(true);
+  copy.querySelectorAll('audio, script, style, .hero-slider-dots, .form-honeypot').forEach((el) => el.remove());
+  const alts = Array.from(copy.querySelectorAll('[alt]'))
+    .map((el) => el.getAttribute('alt') || '')
+    .filter(Boolean);
+  return `${copy.textContent || ''} ${alts.join('. ')}`.replace(/\s+/g, ' ').trim();
+}
+
+export function textFromEvents(data) {
+  const source = data && typeof data === 'object' ? data : {};
+  const records = [...(source.upcoming || []), ...(source.past || [])];
+  const bits = [source.emptyMessage || ''];
+  records.forEach((event) => {
+    bits.push(event.title, event.dateDisplay, event.venue, event.detail, event.ticketLabel, event.ticketText, event.posterAlt);
+  });
+  return bits.filter(Boolean).join(' ');
+}
+
+function searchTerms(query) {
+  return String(query || '')
     .toLowerCase()
     .trim()
     .split(/\s+/)
     .filter(Boolean);
+}
+
+function excerptFor(page, terms) {
+  const summary = `${page.title} ${page.snippet || ''}`.toLowerCase();
+  if (terms.every((term) => summary.includes(term)) || !page.text) return page.snippet;
+
+  const prose = `${page.snippet || ''} ${page.text}`.replace(/\s+/g, ' ').trim();
+  const lower = prose.toLowerCase();
+  let hit = -1;
+  terms.forEach((term) => {
+    const index = lower.indexOf(term);
+    if (index >= 0 && (hit < 0 || index < hit)) hit = index;
+  });
+  if (hit < 0) return page.snippet;
+
+  const start = Math.max(0, hit - 48);
+  const end = Math.min(prose.length, hit + 96);
+  let excerpt = prose.slice(start, end).trim();
+  if (start > 0) excerpt = `…${excerpt}`;
+  if (end < prose.length) excerpt = `${excerpt}…`;
+  return excerpt;
+}
+
+export function searchSite(query, pages = SITE_SEARCH_PAGES) {
+  const terms = searchTerms(query);
   if (!terms.length) return [];
 
-  return SITE_SEARCH_PAGES.map((page) => {
-    const haystack = `${page.title} ${page.snippet} ${page.keywords}`.toLowerCase();
-    if (!terms.every((term) => haystack.includes(term))) return null;
-    const score = terms.reduce((sum, term) => {
-      if (page.title.toLowerCase().includes(term)) return sum + 3;
-      if (page.snippet.toLowerCase().includes(term)) return sum + 2;
-      return sum + 1;
-    }, 0);
-    return { title: page.title, url: page.url, snippet: page.snippet, score };
-  })
+  return pages
+    .map((page) => {
+      const haystack = `${page.title} ${page.snippet} ${page.keywords} ${page.text || ''}`.toLowerCase();
+      if (!terms.every((term) => haystack.includes(term))) return null;
+      const score = terms.reduce((sum, term) => {
+        if (page.title.toLowerCase().includes(term)) return sum + 3;
+        if ((page.snippet || '').toLowerCase().includes(term)) return sum + 2;
+        return sum + 1;
+      }, 0);
+      return { title: page.title, url: page.url, snippet: excerptFor(page, terms), score };
+    })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
+}
+
+function maxEditDistance(word) {
+  return word.length <= 5 ? 1 : 2;
+}
+
+function editDistance(a, b, limit) {
+  if (a === b) return 0;
+  if (Math.abs(a.length - b.length) > limit) return limit + 1;
+
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i += 1) {
+    const next = [i];
+    let rowMin = next[0];
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      const value = Math.min(previous[j] + 1, next[j - 1] + 1, previous[j - 1] + cost);
+      next[j] = value;
+      if (value < rowMin) rowMin = value;
+    }
+    if (rowMin > limit) return limit + 1;
+    previous = next;
+  }
+  return previous[b.length];
+}
+
+function searchVocabulary(pages) {
+  const display = new Map();
+  pages.forEach((page) => {
+    const source = `${page.title} ${page.snippet || ''} ${page.keywords || ''} ${page.text || ''}`;
+    source.split(/[^A-Za-z0-9]+/).forEach((raw) => {
+      const word = raw.toLowerCase();
+      if (word.length < 4 || !/[a-z]/i.test(raw)) return;
+      if (!display.has(word)) display.set(word, raw);
+    });
+  });
+  return display;
+}
+
+function closeWords(term, vocabulary) {
+  const limit = maxEditDistance(term);
+  const matches = [];
+  vocabulary.forEach((label, word) => {
+    if (word === term) return;
+    const distance = editDistance(term, word, limit);
+    if (distance <= limit) matches.push({ word, label, distance });
+  });
+  matches.sort((a, b) => {
+    if (a.distance !== b.distance) return a.distance - b.distance;
+    const lengthGap = Math.abs(a.word.length - term.length) - Math.abs(b.word.length - term.length);
+    if (lengthGap !== 0) return lengthGap;
+    return a.word.localeCompare(b.word);
+  });
+  return matches;
+}
+
+export function similarSearches(query, pages = SITE_SEARCH_PAGES) {
+  const terms = searchTerms(query);
+  if (!terms.length || searchSite(query, pages).length) return [];
+
+  const vocabulary = searchVocabulary(pages);
+  const suggestions = [];
+  const seen = new Set();
+
+  function add(nextQuery, label) {
+    const key = String(nextQuery || '').toLowerCase();
+    if (!key || key === terms.join(' ') || seen.has(key)) return;
+    const matches = searchSite(nextQuery, pages);
+    if (!matches.length) return;
+    seen.add(key);
+    suggestions.push({
+      query: nextQuery,
+      label,
+      pageTitle: matches[0].title,
+    });
+  }
+
+  const corrected = terms.map((term) => closeWords(term, vocabulary)[0] || null);
+  if (corrected.some(Boolean)) {
+    const nextQuery = terms.map((term, index) => (corrected[index] ? corrected[index].word : term)).join(' ');
+    const label = terms.map((term, index) => (corrected[index] ? corrected[index].label : term)).join(' ');
+    add(nextQuery, label);
+  }
+
+  terms.forEach((term) => {
+    closeWords(term, vocabulary)
+      .slice(0, 4)
+      .forEach((match) => add(match.word, match.label));
+  });
+
+  return suggestions.slice(0, 4);
+}
+
+function rememberOpenPage() {
+  const path = window.location.pathname;
+  const openPage = SITE_SEARCH_PAGES.find((page) => {
+    return path.endsWith(`/${page.url}`) || path.endsWith(page.url) || (page.url === 'index.html' && path.endsWith('/'));
+  });
+  const main = document.querySelector('main');
+  if (!openPage || !main) return;
+  openPage.text = textFromMainElement(main);
+}
+
+async function loadSearchText() {
+  await Promise.all(
+    SITE_SEARCH_PAGES.map(async (page) => {
+      try {
+        const response = await fetch(page.url, { cache: 'no-store' });
+        if (!response.ok) return;
+        const text = textFromPageHtml(await response.text());
+        if (text) page.text = text;
+      } catch {
+        /* keep the built-in keywords when a page cannot be read */
+      }
+    })
+  );
+
+  const eventsPage = SITE_SEARCH_PAGES.find((page) => page.url === 'events.html');
+  if (!eventsPage) return;
+
+  try {
+    const response = await fetch('content/events.json', { cache: 'no-store' });
+    if (!response.ok) return;
+    const extra = textFromEvents(await response.json());
+    if (extra) eventsPage.text = `${eventsPage.text || ''} ${extra}`.trim();
+  } catch {
+    /* the events page still matches its title and keywords */
+  }
 }
 
 export function initSiteSearch() {
@@ -192,6 +371,7 @@ export function initSiteSearch() {
       empty.className = 'site-search-empty';
       empty.textContent = 'No matching pages.';
       resultsEl.appendChild(empty);
+      renderSimilarSearches(query);
       resultsEl.hidden = false;
       return;
     }
@@ -213,6 +393,46 @@ export function initSiteSearch() {
     });
 
     resultsEl.hidden = false;
+  }
+
+  function renderSimilarSearches(query) {
+    const suggestions = similarSearches(query);
+    if (!suggestions.length) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'site-search-similar';
+
+    const label = document.createElement('p');
+    label.className = 'site-search-similar-label';
+    label.textContent = 'Similar searches';
+    wrap.appendChild(label);
+
+    suggestions.forEach((suggestion) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'site-search-similar-link';
+
+      const name = document.createElement('strong');
+      name.textContent = suggestion.label;
+      button.appendChild(name);
+
+      if (suggestion.pageTitle && suggestion.pageTitle.toLowerCase() !== suggestion.label.toLowerCase()) {
+        const where = document.createElement('span');
+        where.textContent = suggestion.pageTitle;
+        button.appendChild(where);
+      }
+
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        input.value = suggestion.label;
+        showResults(suggestion.query);
+        input.focus();
+      });
+
+      wrap.appendChild(button);
+    });
+
+    resultsEl.appendChild(wrap);
   }
 
   input.addEventListener('input', () => {
@@ -237,13 +457,18 @@ export function initSiteSearch() {
     if (!form.contains(event.target)) hideResults();
   });
 
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      hideResults();
-      input.blur();
-    }
-  });
-}
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        hideResults();
+        input.blur();
+      }
+    });
+
+    rememberOpenPage();
+    loadSearchText().then(() => {
+      if (input.value.trim()) showResults(input.value);
+    });
+  }
 
 export function initHeroSlider() {
   document.querySelectorAll('.hero-slider').forEach((slider) => {

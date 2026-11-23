@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles, initYoutubeEmbeds, searchSite } from '../js/app.js';
+import { initApp, initContactForm, initExclusiveAudio, initHeroSlider, initParticles, initYoutubeEmbeds, searchSite, similarSearches, textFromEvents, textFromPageHtml } from '../js/app.js';
 
 function buildSiteFixture({ withAudio = false, withCanvas = false, withReveal = true } = {}) {
   document.body.innerHTML = `
@@ -164,6 +164,135 @@ describe('searchSite', () => {
     const results = searchSite('music');
     expect(results[0].url).toBe('music.html');
   });
+
+  it('matches words that appear only in the page body', () => {
+    const pages = [
+      {
+        title: 'Music',
+        url: 'music.html',
+        snippet: 'Listen to Morning Ragas, Evening Ragas, and other sarod recordings.',
+        keywords: 'music recordings',
+        text: 'Rag Bilaskhani Todi Alap Jor. Chandranandan with Marcus Wise.',
+      },
+    ];
+
+    const results = searchSite('todi', pages);
+    expect(results).toHaveLength(1);
+    expect(results[0].url).toBe('music.html');
+    expect(results[0].snippet.toLowerCase()).toContain('todi');
+  });
+
+  it('requires every word to appear on the same page', () => {
+    const pages = [
+      {
+        title: 'Music',
+        url: 'music.html',
+        snippet: 'Morning Ragas.',
+        keywords: '',
+        text: 'Rag Bilaskhani Todi.',
+      },
+    ];
+
+    expect(searchSite('todi gallery', pages)).toEqual([]);
+    expect(searchSite('todi', pages)).toHaveLength(1);
+  });
+});
+
+describe('textFromEvents', () => {
+  it('keeps visitor-facing event text and leaves out file paths', () => {
+    const text = textFromEvents({
+      emptyMessage: 'Coming soon.',
+      upcoming: [],
+      past: [
+        {
+          title: 'Joyful Summer Evening of Raga',
+          date: '2026-05-16',
+          dateDisplay: 'Saturday, May 16, 2026',
+          venue: 'Blacow · Fremont, CA',
+          detail: 'Joanna Mack (sitar), Bruce Hamm (sarod).',
+          ticketUrl: 'https://www.groupmuse.com',
+          ticketLabel: 'Groupmuse.com',
+          poster: 'images/events/joyful-summer-evening-of-raga.png',
+        },
+      ],
+    });
+
+    expect(text).toContain('Joanna Mack');
+    expect(text).toContain('Groupmuse.com');
+    expect(text).toContain('Coming soon.');
+    expect(text).not.toContain('images/events');
+    expect(text).not.toContain('https://www.groupmuse.com');
+  });
+});
+
+describe('similarSearches', () => {
+  const pages = [
+    {
+      title: 'Music',
+      url: 'music.html',
+      snippet: 'Listen to Morning Ragas and other sarod recordings.',
+      keywords: 'music recordings',
+      text: 'Rag Bilaskhani Todi Alap Jor.',
+    },
+    {
+      title: 'Gallery',
+      url: 'gallery.html',
+      snippet: 'Performance photos from decades on stage.',
+      keywords: 'gallery photos',
+      text: '',
+    },
+  ];
+
+  it('suggests a close word when nothing matches exactly', () => {
+    const suggestions = similarSearches('tody', pages);
+    expect(suggestions.map((item) => item.query)).toContain('todi');
+    expect(suggestions[0].pageTitle).toBe('Music');
+  });
+
+  it('does not suggest alternatives for an exact match', () => {
+    expect(similarSearches('todi', pages)).toEqual([]);
+  });
+
+  it('returns nothing when the query is not close to the site', () => {
+    expect(similarSearches('xyzzy', pages)).toEqual([]);
+  });
+
+  it('corrects a misspelled word inside a longer phrase', () => {
+    const eventPage = [
+      {
+        title: 'Events',
+        url: 'events.html',
+        snippet: 'Upcoming concerts.',
+        keywords: 'events',
+        text: 'Student recital in Milpitas.',
+      },
+    ];
+
+    const suggestions = similarSearches('studnt recital', eventPage);
+
+    expect(suggestions[0].query).toBe('student recital');
+    expect(suggestions[0].pageTitle).toBe('Events');
+  });
+});
+
+describe('textFromPageHtml', () => {
+  it('reads the main text and image descriptions, not the navigation', () => {
+    const text = textFromPageHtml(`
+      <header><a href="music.html">Music</a></header>
+      <main>
+        <h1>Events</h1>
+        <p>Student recital in Milpitas.</p>
+        <img alt="Bruce Hamm performing in Kolkata, 2019">
+        <audio>Your browser does not support audio playback.</audio>
+      </main>
+      <footer>Contact</footer>
+    `);
+
+    expect(text).toContain('Milpitas');
+    expect(text).toContain('Kolkata');
+    expect(text).not.toContain('Contact');
+    expect(text).not.toContain('does not support audio playback');
+  });
 });
 
 describe('initSiteSearch', () => {
@@ -189,6 +318,42 @@ describe('initSiteSearch', () => {
     input.dispatchEvent(new Event('input'));
 
     expect(document.querySelector('.site-search-empty').textContent).toBe('No matching pages.');
+  });
+
+  it('offers similar searches for a close spelling', () => {
+    buildSiteFixture();
+    initApp();
+
+    const input = document.querySelector('.site-search-input');
+    input.value = 'galery';
+    input.dispatchEvent(new Event('input'));
+
+    expect(document.querySelector('.site-search-similar-label').textContent).toBe('Similar searches');
+    const suggestion = document.querySelector('.site-search-similar-link');
+    expect(suggestion.textContent.toLowerCase()).toContain('gallery');
+
+    suggestion.click();
+    expect(input.value.toLowerCase()).toContain('gallery');
+    expect(document.querySelector('.site-search-result').textContent).toContain('Gallery');
+  });
+
+  it('hides results when Escape is pressed or the user clicks outside the form', () => {
+    buildSiteFixture();
+    initApp();
+
+    const input = document.querySelector('.site-search-input');
+    const results = document.querySelector('.site-search-results');
+    input.value = 'gallery';
+    input.dispatchEvent(new Event('input'));
+    expect(results.hidden).toBe(false);
+
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(results.hidden).toBe(true);
+
+    input.value = 'gallery';
+    input.dispatchEvent(new Event('input'));
+    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(results.hidden).toBe(true);
   });
 });
 
@@ -358,6 +523,37 @@ describe('initContactForm', () => {
       expect.objectContaining({ method: 'POST' })
     );
   });
+
+  it('shows the server error and re-enables the button when Formspree rejects the message', async () => {
+    window.BruceHammSite = { formspreeFormId: 'abc123xy' };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: 'Form is closed.' }),
+    });
+
+    initContactForm();
+    document.querySelector('.contact-form').requestSubmit();
+
+    await vi.waitFor(() => {
+      expect(document.querySelector('.form-status').textContent).toBe('Form is closed.');
+    });
+
+    const button = document.querySelector('[type="submit"]');
+    expect(button.disabled).toBe(false);
+    expect(button.textContent).toBe('Send Message');
+  });
+
+  it('shows a network error when the request cannot be sent', async () => {
+    window.BruceHammSite = { formspreeFormId: 'abc123xy' };
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
+
+    initContactForm();
+    document.querySelector('.contact-form').requestSubmit();
+
+    await vi.waitFor(() => {
+      expect(document.querySelector('.form-status').textContent).toContain('Network error');
+    });
+  });
 });
 
 describe('initHeroSlider', () => {
@@ -393,6 +589,35 @@ describe('initHeroSlider', () => {
 
     vi.advanceTimersByTime(3000);
     expect(slides[2].classList.contains('is-active')).toBe(true);
+  });
+
+  it('stops autoplay while the pointer is over the slider', () => {
+    initHeroSlider();
+    const slider = document.querySelector('.hero-slider');
+    const slides = document.querySelectorAll('.hero-slide');
+
+    slider.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(3000);
+
+    expect(slides[0].classList.contains('is-active')).toBe(true);
+  });
+
+  it('does not autoplay when reduced motion is preferred', () => {
+    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true });
+    initHeroSlider();
+
+    vi.advanceTimersByTime(3000);
+
+    expect(document.querySelectorAll('.hero-slide')[0].classList.contains('is-active')).toBe(true);
+  });
+
+  it('leaves the slider unchanged when the dots do not match the slides', () => {
+    document.querySelector('.hero-slider-dot').remove();
+    initHeroSlider();
+
+    document.querySelector('.hero-slider-dot').click();
+
+    expect(document.querySelectorAll('.hero-slide')[0].classList.contains('is-active')).toBe(true);
   });
 });
 
