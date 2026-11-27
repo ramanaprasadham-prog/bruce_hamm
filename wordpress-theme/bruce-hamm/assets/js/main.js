@@ -3,6 +3,8 @@
 
   document.documentElement.classList.add('js');
 
+  const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';
+
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -248,8 +250,6 @@
     });
   }
 
-  const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';
-
   function getFormspreeEndpoint() {
     const config = window.BruceHammSite || {};
     const formId = config.formspreeFormId;
@@ -284,7 +284,7 @@
         setContactFormStatus(
           form,
           'error',
-          'This form is not configured yet. Add your Formspree form ID in js/site-config.js.'
+          'This form is not configured yet. Add the Formspree form ID under Appearance → Customize → Contact Form.'
         );
         return;
       }
@@ -307,10 +307,13 @@
           setContactFormStatus(form, 'success', 'Thank you — your message has been sent.');
         } else {
           const data = await response.json().catch(() => ({}));
+          const detail = Array.isArray(data.errors)
+            ? data.errors.map((item) => item && item.message).filter(Boolean).join(' ')
+            : '';
           const message =
             typeof data.error === 'string'
               ? data.error
-              : 'Something went wrong. Please try again or email Bruce directly.';
+              : detail || 'Something went wrong. Please try again or email Bruce directly.';
           setContactFormStatus(form, 'error', message);
         }
       } catch {

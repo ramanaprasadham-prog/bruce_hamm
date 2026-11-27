@@ -1,3 +1,0 @@
-window.BruceHammSite = {
-  formspreeFormId: 'maqgqnee',
-};

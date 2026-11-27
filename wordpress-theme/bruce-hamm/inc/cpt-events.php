@@ -40,26 +40,36 @@ add_action('add_meta_boxes', 'bruce_hamm_event_meta_boxes');
 function bruce_hamm_render_event_meta_box($post)
 {
     wp_nonce_field('bruce_hamm_event_meta', 'bruce_hamm_event_nonce');
-    $fields = [
-        'event_date' => ['Date (YYYY-MM-DD)', get_post_meta($post->ID, 'event_date', true)],
-        'event_date_display' => ['Date display', get_post_meta($post->ID, 'event_date_display', true)],
-        'event_venue' => ['Venue', get_post_meta($post->ID, 'event_venue', true)],
-        'event_poster' => ['Poster image URL', get_post_meta($post->ID, 'event_poster', true)],
-        'event_poster_alt' => ['Poster alt text', get_post_meta($post->ID, 'event_poster_alt', true)],
-        'event_ticket_url' => ['Ticket URL', get_post_meta($post->ID, 'event_ticket_url', true)],
-        'event_ticket_label' => ['Ticket label', get_post_meta($post->ID, 'event_ticket_label', true)],
-        'event_ticket_text' => ['Ticket sentence prefix', get_post_meta($post->ID, 'event_ticket_text', true)],
-    ];
+    $get = function ($key) use ($post) {
+        return (string) get_post_meta($post->ID, $key, true);
+    };
 
-    echo '<p>Use the editor for the event description. Featured image can also be used as the poster.</p>';
-    foreach ($fields as $key => $field) {
+    $text_field = function ($key, $label, $help = '', $type = 'text') use ($get) {
         printf(
-            '<p><label for="%1$s"><strong>%2$s</strong></label><br><input type="text" class="widefat" id="%1$s" name="%1$s" value="%3$s"></p>',
+            '<p><label for="%1$s"><strong>%2$s</strong></label><br><input type="%5$s" class="widefat" id="%1$s" name="%1$s" value="%3$s">%4$s</p>',
             esc_attr($key),
-            esc_html($field[0]),
-            esc_attr($field[1])
+            esc_html($label),
+            esc_attr($get($key)),
+            $help ? '<span class="description">' . esc_html($help) . '</span>' : '',
+            esc_attr($type)
         );
-    }
+    };
+
+    echo '<p>Write the description of the concert in the main editor above (plain text). Fill in the details below.</p>';
+
+    $text_field('event_date', 'Concert date', 'Used to sort the list and to decide whether the concert is upcoming or past.', 'date');
+    $text_field('event_date_display', 'Date as shown on the page', 'Optional. Example: Saturday, June 13, 2026 · 3:00–7:00 PM. If left empty the date above is used.');
+    $text_field('event_venue', 'Venue', 'Example: Sri Krishna Balaram Mandir · 680 E Calaveras Blvd, Milpitas, CA 95035');
+
+    echo '<p><strong>Poster</strong><br><span class="description">Choose a poster image, or leave empty to use the Featured image on the right.</span></p>';
+    bruce_hamm_media_input('event_poster', $get('event_poster'), 'image');
+    $text_field('event_poster_alt', 'Poster description (for screen readers)');
+
+    echo '<hr>';
+    echo '<p><strong>Tickets (optional)</strong></p>';
+    $text_field('event_ticket_url', 'Ticket link address', '', 'url');
+    $text_field('event_ticket_label', 'Ticket link text', 'Example: Groupmuse.com');
+    $text_field('event_ticket_text', 'Words before the ticket link', 'Example: Tickets were available on');
 }
 
 function bruce_hamm_save_event_meta($post_id)
@@ -93,7 +103,7 @@ function bruce_hamm_save_event_meta($post_id)
         if ('event_ticket_url' === $key || 'event_poster' === $key) {
             $value = esc_url_raw(wp_unslash($_POST[$key]));
         }
-        update_post_meta($post_id, $key, $value);
+        update_post_meta($post_id, $key, wp_slash($value));
     }
 }
 
@@ -101,7 +111,7 @@ add_action('save_post_bruce_event', 'bruce_hamm_save_event_meta');
 
 function bruce_hamm_get_events($upcoming = true)
 {
-    $today = gmdate('Y-m-d');
+    $today = wp_date('Y-m-d');
     $query = new WP_Query([
         'post_type' => 'bruce_event',
         'post_status' => 'publish',
@@ -125,7 +135,11 @@ function bruce_hamm_get_events($upcoming = true)
 function bruce_hamm_render_event_card($post)
 {
     $date = get_post_meta($post->ID, 'event_date', true);
-    $date_display = get_post_meta($post->ID, 'event_date_display', true) ?: $date;
+    $date_display = get_post_meta($post->ID, 'event_date_display', true);
+    if (!$date_display && $date) {
+        $timestamp = strtotime($date . ' 12:00:00 UTC');
+        $date_display = $timestamp ? wp_date(get_option('date_format'), $timestamp, new DateTimeZone('UTC')) : $date;
+    }
     $venue = get_post_meta($post->ID, 'event_venue', true);
     $poster = get_post_meta($post->ID, 'event_poster', true);
     $poster_alt = get_post_meta($post->ID, 'event_poster_alt', true) ?: get_the_title($post);

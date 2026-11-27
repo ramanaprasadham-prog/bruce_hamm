@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -66,6 +66,40 @@ describe('site javascript sources', () => {
     it(`keeps shared behavior in main.js and app.js: ${snippet}`, () => {
       expect(mainJs).toContain(snippet);
       expect(appJs).toContain(snippet);
+    });
+  });
+});
+
+describe('main.js on the contact page', () => {
+  const sources = {
+    'js/main.js': mainJs,
+    'wordpress-theme/bruce-hamm/assets/js/main.js': readFileSync(
+      resolve(root, 'wordpress-theme/bruce-hamm/assets/js/main.js'),
+      'utf8'
+    ),
+  };
+
+  Object.entries(sources).forEach(([name, source]) => {
+    it(`${name} runs without errors and wires up the Formspree form`, async () => {
+      document.body.innerHTML = `
+        <form class="contact-form" action="https://formspree.io/f/abc123xy" method="POST">
+          <input type="text" name="name" value="Test">
+          <p class="form-status" hidden></p>
+          <button type="submit">Send Message</button>
+        </form>
+      `;
+      window.BruceHammSite = { formspreeFormId: 'abc123xy' };
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true });
+
+      expect(() => new Function(source)()).not.toThrow();
+
+      document.querySelector('.contact-form').requestSubmit();
+      await vi.waitFor(() => {
+        expect(document.querySelector('.form-status').textContent).toContain('Thank you');
+      });
+      expect(fetchSpy).toHaveBeenCalledWith('https://formspree.io/f/abc123xy', expect.anything());
+
+      fetchSpy.mockRestore();
     });
   });
 });

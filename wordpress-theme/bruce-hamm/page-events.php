@@ -1,49 +1,48 @@
 <?php get_header(); ?>
 <main>
-  <section class="page-hero">
-    <div class="page-hero-inner">
-      <p class="eyebrow reveal">Live Performances</p>
-      <h1 class="page-title reveal">Events</h1>
-      <p class="page-subtitle reveal">Concerts, appearances, and performances — upcoming and past.</p>
-    </div>
-  </section>
+  <?php bruce_hamm_page_hero(); ?>
 
   <section class="page-content page-content-wide">
     <div class="events-section reveal">
-      <h2 class="events-section-title">Upcoming Events</h2>
+      <h2 class="events-section-title"><?php echo esc_html(bruce_hamm_get('upcoming_title')); ?></h2>
       <div id="events-upcoming" aria-live="polite">
         <?php
         $upcoming = bruce_hamm_get_events(true);
         if ($upcoming) :
             echo '<ul class="event-list">';
             foreach ($upcoming as $event) {
-                echo bruce_hamm_render_event_card($event);
+                echo bruce_hamm_render_event_card($event); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside the renderer.
             }
             echo '</ul>';
         else :
+            $booking = bruce_hamm_get('upcoming_booking');
             ?>
           <div class="events-empty">
-            <p>Coming soon. New concert dates and appearances will be posted here.</p>
-            <p>For booking inquiries, please <a href="<?php echo esc_url(bruce_hamm_page_url('contact')); ?>">get in touch</a>.</p>
+            <?php if ('' !== bruce_hamm_get('upcoming_empty')) : ?>
+              <p><?php echo esc_html(bruce_hamm_get('upcoming_empty')); ?></p>
+            <?php endif; ?>
+            <?php if ('' !== $booking) : ?>
+              <p><?php echo bruce_hamm_link_phrase($booking, 'get in touch', bruce_hamm_page_url('contact')); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside the helper. ?></p>
+            <?php endif; ?>
           </div>
         <?php endif; ?>
       </div>
     </div>
 
     <div class="events-section reveal">
-      <h2 class="events-section-title">Past Events</h2>
+      <h2 class="events-section-title"><?php echo esc_html(bruce_hamm_get('past_title')); ?></h2>
       <div id="events-past" aria-live="polite">
         <?php
         $past = bruce_hamm_get_events(false);
         if ($past) :
             echo '<ul class="event-list">';
             foreach ($past as $event) {
-                echo bruce_hamm_render_event_card($event);
+                echo bruce_hamm_render_event_card($event); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside the renderer.
             }
             echo '</ul>';
         else :
             ?>
-          <div class="events-empty"><p>No past events listed yet.</p></div>
+          <div class="events-empty"><p><?php echo esc_html(bruce_hamm_get('past_empty')); ?></p></div>
         <?php endif; ?>
       </div>
     </div>

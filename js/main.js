@@ -3,6 +3,8 @@
 
   document.documentElement.classList.add('js');
 
+  const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';
+
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -471,8 +473,6 @@
   }
 
   initSiteSearch();
-
-  const FORMSPREE_PLACEHOLDER_ID = 'YOUR_FORMSPREE_FORM_ID';
 
   function getFormspreeEndpoint() {
     const config = window.BruceHammSite || {};
