@@ -3,9 +3,15 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('BRUCE_HAMM_VERSION', '1.0.0');
+define('BRUCE_HAMM_VERSION', '1.1.0');
+define('BRUCE_HAMM_DEFAULT_FOOTER_TAGLINE', 'North Indian classical music with Bruce Hamm — sarod, sitar, and vocal study in the California Bay Area.');
 
 require get_template_directory() . '/inc/template-tags.php';
+require get_template_directory() . '/inc/schema.php';
+require get_template_directory() . '/inc/fields.php';
+require get_template_directory() . '/inc/default-content.php';
+require get_template_directory() . '/inc/patterns.php';
+require get_template_directory() . '/inc/customizer.php';
 require get_template_directory() . '/inc/cpt-events.php';
 require get_template_directory() . '/inc/setup.php';
 
@@ -15,6 +21,8 @@ function bruce_hamm_theme_setup()
     add_theme_support('post-thumbnails');
     add_theme_support('html5', ['search-form', 'gallery', 'caption', 'style', 'script']);
     add_theme_support('automatic-feed-links');
+    add_theme_support('editor-styles');
+    add_editor_style('assets/css/editor.css');
 }
 
 add_action('after_setup_theme', 'bruce_hamm_theme_setup');
@@ -44,7 +52,7 @@ function bruce_hamm_enqueue_assets()
     );
 
     wp_localize_script('bruce-hamm', 'BruceHammSite', [
-        'formspreeFormId' => apply_filters('bruce_hamm_formspree_id', 'maqgqnee'),
+        'formspreeFormId' => bruce_hamm_formspree_id(),
         'searchPages' => bruce_hamm_search_pages(),
     ]);
 }

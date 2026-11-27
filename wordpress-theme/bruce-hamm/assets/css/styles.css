@@ -958,6 +958,11 @@ main {
   margin-bottom: 0.75rem;
 }
 
+.bio-block p.bio-year {
+  color: var(--accent-muted);
+  margin-bottom: 0.75rem;
+}
+
 .bio-block h2 {
   font-family: var(--font-display);
   font-size: 1.35rem;

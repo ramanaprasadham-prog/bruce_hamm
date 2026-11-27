@@ -1,0 +1,18 @@
+.bh-field { margin: 0 0 14px; }
+.bh-label { display: block; font-weight: 600; margin: 0 0 4px; }
+.bh-repeater { margin: 0 0 18px; }
+.bh-rows { display: flex; flex-direction: column; gap: 8px; }
+.bh-row { border: 1px solid #c3c4c7; border-radius: 4px; background: #fff; }
+.bh-row-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f6f7f7; border-bottom: 1px solid #dcdcde; }
+.bh-row-head { cursor: pointer; }
+.bh-row:not(.is-open) .bh-row-body { display: none; }
+.bh-row:not(.is-open) .bh-row-head { border-bottom: 0; }
+.bh-row-handle { cursor: move; color: #787c82; }
+.bh-row-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bh-row-tools { display: inline-flex; gap: 12px; }
+.bh-row-remove { color: #b32d2e; }
+.bh-row-body { padding: 12px; }
+.bh-media-preview img { max-width: 220px; max-height: 140px; margin: 4px 0 8px; border: 1px solid #dcdcde; display: block; }
+.bh-media-actions { margin: 6px 0 0; display: flex; gap: 12px; align-items: center; }
+.bh-media-clear { color: #b32d2e; }
+.bh-field input.widefat, .bh-field textarea.widefat { width: 100%; max-width: 100%; box-sizing: border-box; }

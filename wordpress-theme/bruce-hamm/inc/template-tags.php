@@ -103,3 +103,155 @@ function bruce_hamm_search_pages()
 
     return $results;
 }
+
+function bruce_hamm_page_hero()
+{
+    ?>
+  <section class="page-hero">
+    <div class="page-hero-inner">
+      <?php $eyebrow = bruce_hamm_get('eyebrow'); ?>
+      <?php if ('' !== $eyebrow) : ?>
+        <p class="eyebrow reveal"><?php echo esc_html($eyebrow); ?></p>
+      <?php endif; ?>
+      <h1 class="page-title reveal"><?php echo esc_html(get_the_title(bruce_hamm_current_page_id())); ?></h1>
+      <?php $subtitle = bruce_hamm_get('subtitle'); ?>
+      <?php if ('' !== $subtitle) : ?>
+        <p class="page-subtitle reveal"><?php echo esc_html($subtitle); ?></p>
+      <?php endif; ?>
+    </div>
+  </section>
+    <?php
+}
+
+/** The text of the page editor, rendered the way WordPress normally renders it. */
+function bruce_hamm_page_body()
+{
+    $post = get_post(bruce_hamm_current_page_id());
+    if (!$post) {
+        return '';
+    }
+
+    return apply_filters('the_content', $post->post_content);
+}
+
+/** The page editor text as one plain paragraph (used for the home page headline text). */
+function bruce_hamm_page_body_plain()
+{
+    $post = get_post(bruce_hamm_current_page_id());
+    if (!$post) {
+        return '';
+    }
+
+    return trim(preg_replace('/\s+/', ' ', wp_strip_all_tags(strip_shortcodes($post->post_content))));
+}
+
+function bruce_hamm_slider($slides, $label)
+{
+    $slides = array_values(array_filter((array) $slides, function ($slide) {
+        return !empty($slide['image']);
+    }));
+    if (!$slides) {
+        return;
+    }
+    ?>
+        <div class="hero-slider reveal" data-autoplay="6000">
+          <div class="hero-slider-viewport">
+            <div class="hero-slider-track">
+              <?php foreach ($slides as $i => $slide) : ?>
+                <figure class="hero-slide<?php echo 0 === $i ? ' is-active' : ''; ?>">
+                  <div class="carousel-slide-frame">
+                    <img src="<?php echo esc_url($slide['image']); ?>" alt="<?php echo esc_attr($slide['alt']); ?>">
+                  </div>
+                </figure>
+              <?php endforeach; ?>
+            </div>
+          </div>
+          <div class="hero-slider-dots" role="tablist" aria-label="<?php echo esc_attr($label); ?>">
+            <?php foreach ($slides as $i => $slide) : ?>
+              <button type="button" class="hero-slider-dot<?php echo 0 === $i ? ' is-active' : ''; ?>" aria-label="<?php echo esc_attr('Show photo ' . ($i + 1)); ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>"></button>
+            <?php endforeach; ?>
+          </div>
+        </div>
+    <?php
+}
+
+/**
+ * Pulls the video id and optional start time (in seconds) out of a YouTube address.
+ *
+ * @return array{id:string,start:int}|null
+ */
+function bruce_hamm_parse_youtube($url)
+{
+    $url = trim((string) $url);
+    if ('' === $url) {
+        return null;
+    }
+
+    $id = '';
+    if (preg_match('/^[A-Za-z0-9_-]{11}$/', $url)) {
+        $id = $url;
+    } elseif (preg_match('~(?:youtu\.be/|youtube(?:-nocookie)?\.com/(?:embed/|shorts/|live/|v/)|[?&]v=)([A-Za-z0-9_-]{11})~', $url, $m)) {
+        $id = $m[1];
+    }
+    if ('' === $id) {
+        return null;
+    }
+
+    $start = 0;
+    if (preg_match('/[?&#](?:t|start)=([0-9hms]+)/', $url, $m)) {
+        $time = $m[1];
+        if (preg_match('/^\d+$/', $time)) {
+            $start = (int) $time;
+        } elseif (preg_match('/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/', $time, $parts)) {
+            $start = ((int) ($parts[1] ?? 0)) * 3600 + ((int) ($parts[2] ?? 0)) * 60 + ((int) ($parts[3] ?? 0));
+        }
+    }
+
+    return ['id' => $id, 'start' => $start];
+}
+
+/* ------------------------------------------------------------------------
+ * Contact form (Formspree)
+ * --------------------------------------------------------------------- */
+
+const BRUCE_HAMM_DEFAULT_FORMSPREE_ID = 'maqgqnee';
+
+/**
+ * Accepts a bare form id or a pasted Formspree address (https://formspree.io/f/xxxx)
+ * and returns just the id, or '' when it does not look valid.
+ */
+function bruce_hamm_normalize_formspree_id($value)
+{
+    $value = trim((string) $value);
+    if ('' === $value) {
+        return '';
+    }
+
+    if (preg_match('~formspree\.io/f/([A-Za-z0-9]+)/?(?:[?#].*)?$~i', $value, $m)) {
+        $value = $m[1];
+    }
+
+    return preg_match('/^[A-Za-z0-9]+$/', $value) ? $value : '';
+}
+
+function bruce_hamm_formspree_id()
+{
+    $saved = get_theme_mod('bruce_hamm_formspree_id', BRUCE_HAMM_DEFAULT_FORMSPREE_ID);
+    $id = bruce_hamm_normalize_formspree_id($saved);
+
+    return (string) apply_filters('bruce_hamm_formspree_id', $id);
+}
+
+
+/** Escapes $text and turns the first occurrence of $phrase into a link. */
+function bruce_hamm_link_phrase($text, $phrase, $url)
+{
+    $position = stripos($text, $phrase);
+    if (false === $position) {
+        return esc_html($text);
+    }
+
+    return esc_html(substr($text, 0, $position))
+        . '<a href="' . esc_url($url) . '">' . esc_html(substr($text, $position, strlen($phrase))) . '</a>'
+        . esc_html(substr($text, $position + strlen($phrase)));
+}

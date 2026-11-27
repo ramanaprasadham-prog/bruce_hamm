@@ -1,0 +1,69 @@
+/* Makes the page editor look like the live site so edits are easy to judge. */
+:root {
+  --bg-deep: #101215;
+  --bg-surface: rgba(22, 24, 28, 0.94);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #f4f1ea;
+  --text-muted: rgba(244, 241, 234, 0.68);
+  --accent: #c9a227;
+  --accent-muted: #9a8868;
+  --radius-lg: 18px;
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+}
+
+body.editor-styles-wrapper {
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  padding: 1.5rem;
+}
+
+.editor-styles-wrapper p {
+  color: var(--text-muted);
+}
+
+.editor-styles-wrapper .bio-block {
+  position: relative;
+  padding: 2rem 2rem 2rem 2.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.editor-styles-wrapper .bio-block::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.editor-styles-wrapper .bio-year {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-muted);
+  margin-bottom: 0.75rem;
+}
+
+.editor-styles-wrapper .bio-block h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.85rem;
+}
+
+.editor-styles-wrapper .bio-block p {
+  margin: 0;
+}

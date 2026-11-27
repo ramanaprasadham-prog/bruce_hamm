@@ -5,7 +5,7 @@
           <span class="footer-brand-text">Bruce Hamm</span>
         </a>
         <p class="footer-tagline">
-          North Indian classical music with Bruce Hamm — sarod, sitar, and vocal study in the California Bay Area.
+          <?php echo esc_html(get_theme_mod('bruce_hamm_footer_tagline', BRUCE_HAMM_DEFAULT_FOOTER_TAGLINE)); ?>
         </p>
       </div>
       <nav class="footer-nav" aria-label="Footer navigation">

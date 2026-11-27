@@ -6,6 +6,7 @@ if (!defined('ABSPATH')) {
 function bruce_hamm_activate_theme()
 {
     bruce_hamm_create_pages();
+    bruce_hamm_seed_editor_content();
     bruce_hamm_seed_events();
 
     if (!get_option('permalink_structure')) {
@@ -19,48 +20,26 @@ add_action('after_switch_theme', 'bruce_hamm_activate_theme');
 
 function bruce_hamm_create_pages()
 {
-    $pages = [
-        [
-            'title' => 'Home',
-            'slug' => 'home',
-            'content' => 'Bruce Hamm is a long-time disciple of Ustad Ali Akbar Khan — an accomplished performer and respected teacher in the California Bay Area.',
-        ],
-        [
-            'title' => 'Biography',
-            'slug' => 'biography',
-            'content' => 'A lifelong journey through North Indian classical music under the guidance of a legendary maestro. Disciple of Ustad Ali Akbar Khan, instructor at Ali Akbar College of Music, and co-founder of Path of Raga.',
-        ],
-        [
-            'title' => 'Gallery',
-            'slug' => 'gallery',
-            'content' => 'Performance photos and archival images from decades on stage, including Ali Akbar Khan, Swapan Chaudhuri, Calcutta, Jabalpur, and the Allaudin Khan Festival.',
-        ],
-        [
-            'title' => 'Music',
-            'slug' => 'music',
-            'content' => 'Listen to Morning Ragas, Evening Ragas, Chandranandan, Jogia Kalengra, and other sarod recordings.',
-        ],
-        [
-            'title' => 'Videos',
-            'slug' => 'videos',
-            'content' => 'Watch concert footage and performances on the Bruce Hamm YouTube channel.',
-        ],
-        [
-            'title' => 'Events',
-            'slug' => 'events',
-            'content' => 'Upcoming concerts and past appearances.',
-        ],
-        [
-            'title' => 'Lessons',
-            'slug' => 'lessons',
-            'content' => 'Private instrumental lessons and vocal study in North Indian classical music for sarod, sitar, and other instruments.',
-        ],
-        [
-            'title' => 'Contact',
-            'slug' => 'contact',
-            'content' => 'Reach out for performances, lessons, or general inquiries.',
-        ],
+    $editor_pages = bruce_hamm_editor_pages();
+    $titles = [
+        'home' => 'Home',
+        'biography' => 'Biography',
+        'gallery' => 'Gallery',
+        'music' => 'Music',
+        'videos' => 'Videos',
+        'events' => 'Events',
+        'lessons' => 'Lessons',
+        'contact' => 'Contact',
     ];
+
+    $pages = [];
+    foreach ($titles as $slug => $title) {
+        $pages[] = [
+            'title' => $title,
+            'slug' => $slug,
+            'content' => isset($editor_pages[$slug]) ? call_user_func($editor_pages[$slug]['default']) : '',
+        ];
+    }
 
     $created = [];
     foreach ($pages as $page) {
@@ -73,7 +52,7 @@ function bruce_hamm_create_pages()
         $created[$page['slug']] = wp_insert_post([
             'post_title' => $page['title'],
             'post_name' => $page['slug'],
-            'post_content' => $page['content'],
+            'post_content' => wp_slash($page['content']),
             'post_status' => 'publish',
             'post_type' => 'page',
         ]);
